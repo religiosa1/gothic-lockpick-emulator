@@ -51,15 +51,19 @@
 
 <section class="tumblers">
 	<h2>Lock View</h2>
-	<div class="lock-view">
-		<ul class="tumblers-list">
-			{#each field.tumblers as tumbler, idx}
-				<li class="tumblers-list__item" class:selected={idx === field.selectedTumblerIdx}>
-					<TumblerView {tumbler} width={field.tumblerWidth} targetRow={field.tumblerRow} />
-				</li>
-			{/each}
-		</ul>
-	</div>
+	<ul class="tumblers-list" data-field-width={(field.tumblerWidth - 1) * 2 + 1}>
+		{#each field.tumblers as tumbler, idx}
+			{@const depExpression = field.dependencies[field.selectedTumblerIdx][idx]}
+			<li
+				class="tumblers-list__item"
+				class:selected={idx === field.selectedTumblerIdx}
+				class:dep-neg={depExpression < 0}
+				class:dep-pos={depExpression > 0}
+			>
+				<TumblerView {tumbler} width={field.tumblerWidth} targetRow={field.tumblerRow} />
+			</li>
+		{/each}
+	</ul>
 </section>
 
 <section class="dependencies">
@@ -138,15 +142,36 @@
 		--clr-hl: green;
 	}
 	.tumblers-list {
+		counter-reset: tumblers;
 		display: block;
 		width: max-content;
+		--field-width: attr(data-field-width type(<number>), 0);
+		width: calc(var(--pin-width) * var(--field-width));
 		margin: 0;
-		padding: 0;
+		padding: 0 var(--pin-width);
 		list-style: none;
+	}
+	.tumblers-list__item {
+		position: relative;
+		&::before {
+			counter-increment: tumblers;
+			position: absolute;
+			content: counter(tumblers, upper-alpha);
+			inset: 0;
+			right: auto;
+			left: calc(var(--pin-width) * -1);
+		}
+	}
+	.tumblers-list__item.dep-neg {
+		background: hwb(from var(--clr-neg) h w b / 0.12);
+	}
+	.tumblers-list__item.dep-pos {
+		background: hwb(from var(--clr-pos) h w b / 0.12);
 	}
 	.tumblers-list__item.selected {
 		outline-color: var(--clr-hl);
 		outline: 2px solid;
+		background: hwb(from var(--clr-hl) h w b / 0.06);
 	}
 	.deptable {
 		vertical-align: center;

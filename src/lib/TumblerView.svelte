@@ -7,7 +7,7 @@
 		targetRow: number;
 	}
 	let { tumbler, width, targetRow }: Props = $props();
-	let offset = $derived(width - tumbler.currentPosition);
+	let offset = $derived(width - tumbler.currentPosition - 1);
 </script>
 
 <ul data-pos={tumbler.currentPosition} data-offset={offset} class="tumbler">
@@ -52,12 +52,12 @@
 		background: black;
 	}
 	.pin.pin-current::after {
-		background: yellow;
+		background: gold;
 	}
 	.pin-target::after {
-		background: brown;
+		background: #660000;
 	}
 	.pin-current.pin-target::after {
-		background: darkorange;
+		background: red;
 	}
 </style>
