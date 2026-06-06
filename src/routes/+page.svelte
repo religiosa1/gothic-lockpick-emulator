@@ -3,44 +3,52 @@
 	import { idxToChar } from '$lib/models/TumblerIdx';
 	import { saveLockView, tryRestoreLockView } from '$lib/persistency/lockView';
 
-	const field = tryRestoreLockView().field;
+	const savedState = tryRestoreLockView();
+	const field = savedState.field;
+
+	let lockName = $state(savedState.lockName);
+
 	function save() {
-		saveLockView({ field });
+		saveLockView({ field, lockName });
 	}
+
+	let lockViewEl: HTMLUListElement;
 </script>
 
 <h1>Gothic Lockpicking Emulator</h1>
 
 <svelte:document
 	onkeydown={(e) => {
+		// preventing tumblers moving on input to the header and such --
+		// not processing click events by early return
+		if (
+			document.activeElement !== document.body &&
+			document.activeElement !== lockViewEl &&
+			!lockViewEl?.contains(document.activeElement)
+		) {
+			return;
+		}
 		switch (e.key) {
 			case 'ArrowUp':
+			case 'w':
 			case 'k': {
-				let newValue = field.selectedTumblerIdx - 1;
-				if (newValue < 0) {
-					newValue = field.nTumblers - 1;
-				}
-				field.selectedTumblerIdx = newValue;
+				field.selectPrevTumbler();
 				break;
 			}
-
 			case 'ArrowDown':
+			case 's':
 			case 'j': {
-				let newValue = field.selectedTumblerIdx + 1;
-				if (newValue >= field.nTumblers) {
-					newValue = 0;
-				}
-				field.selectedTumblerIdx = newValue;
+				field.selectNextTumbler();
 				break;
 			}
-
 			case 'ArrowLeft':
+			case 'a':
 			case 'h': {
 				field.moveTumbler(field.selectedTumblerIdx, 1);
 				break;
 			}
-
 			case 'ArrowRight':
+			case 'd':
 			case 'l': {
 				field.moveTumbler(field.selectedTumblerIdx, -1);
 				break;
@@ -49,27 +57,42 @@
 	}}
 />
 
+<h2 contenteditable bind:textContent={lockName}></h2>
+
 <section class="tumblers">
-	<h2>Lock View</h2>
-	<ul class="tumblers-list" data-field-width={(field.tumblerWidth - 1) * 2 + 1}>
+	<h3>Lock View</h3>
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<!-- svelte-ignore a11y_autofocus -->
+	<ul
+		bind:this={lockViewEl}
+		tabindex="0"
+		class="tumblers-list"
+		data-field-width={(field.tumblerWidth - 1) * 2 + 1}
+	>
 		{#each field.tumblers as tumbler, idx}
 			{@const depExpression = field.dependencies[field.selectedTumblerIdx][idx]}
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<li
 				class="tumblers-list__item"
 				class:selected={idx === field.selectedTumblerIdx}
 				class:dep-neg={depExpression < 0}
 				class:dep-pos={depExpression > 0}
+				onclick={() => (field.selectedTumblerIdx = idx)}
 			>
 				<TumblerView {tumbler} width={field.tumblerWidth} targetRow={field.tumblerRow} />
 			</li>
 		{/each}
 	</ul>
+	<small>use arrow keys, wasd or hjkl for modifying</small>
 </section>
 
 <section class="dependencies">
-	<h2>Dependecies table</h2>
+	<h3>Dependecies table</h3>
 
-	<table class="deptable">
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<table class="deptable" tabindex="0">
 		<thead>
 			<tr>
 				<th>sel</th>
@@ -92,31 +115,32 @@
 							<td>⨯</td>
 						{:else}
 							{@const expression = field.dependencies[idx][depIdx]}
-							<td
-								class="dep-cell"
-								class:dep-pos={expression > 0}
-								class:dep-neg={expression < 0}
-								onclick={(e) => {
-									const newValue = (() => {
-										switch (expression) {
-											case 1:
-												return e.ctrlKey ? 0 : -1;
-											case -1:
-												return e.ctrlKey ? 1 : 0;
-											default:
-												return e.ctrlKey ? -1 : 1;
-										}
-									})();
-									field.dependencies[idx][depIdx] = Math.min(Math.max(newValue, -1), 1);
-								}}
-							>
-								{#if expression === 1}
-									+
-								{:else if expression === -1}
-									-
-								{:else if expression !== 0}
-									{expression}
-								{/if}
+							<td class="dep-cell" class:dep-pos={expression > 0} class:dep-neg={expression < 0}>
+								<button
+									class="dep-cell__btn"
+									type="button"
+									onclick={(e) => {
+										const newValue = (() => {
+											switch (expression) {
+												case 1:
+													return e.ctrlKey ? 0 : -1;
+												case -1:
+													return e.ctrlKey ? 1 : 0;
+												default:
+													return e.ctrlKey ? -1 : 1;
+											}
+										})();
+										field.dependencies[idx][depIdx] = Math.min(Math.max(newValue, -1), 1);
+									}}
+								>
+									{#if expression === 1}
+										+
+									{:else if expression === -1}
+										-
+									{:else if expression !== 0}
+										{expression}
+									{/if}
+								</button>
 							</td>
 						{/if}
 					{/each}
@@ -153,6 +177,7 @@
 	}
 	.tumblers-list__item {
 		position: relative;
+		margin: 1px 0;
 		&::before {
 			counter-increment: tumblers;
 			position: absolute;
@@ -183,8 +208,17 @@
 		}
 	}
 	.dep-cell {
+		padding: 0;
+	}
+	.dep-cell__btn {
 		cursor: pointer;
+		display: block;
+		height: 1.2em;
+		background: none;
+		border: none;
 		min-width: 2.5ch;
+		aspect-ratio: 1;
+		color: currentColor;
 	}
 	.dep-pos {
 		color: var(--clr-pos);

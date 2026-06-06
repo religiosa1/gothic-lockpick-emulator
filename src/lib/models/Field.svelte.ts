@@ -54,4 +54,20 @@ export class Field {
 		}
 		return blockingTumblerIdxs;
 	}
+
+	selectPrevTumbler() {
+		let newValue = this.selectedTumblerIdx - 1;
+		if (newValue < 0) {
+			newValue = this.nTumblers - 1;
+		}
+		this.selectedTumblerIdx = newValue;
+	}
+
+	selectNextTumbler() {
+		let newValue = this.selectedTumblerIdx + 1;
+		if (newValue >= this.nTumblers) {
+			newValue = 0;
+		}
+		this.selectedTumblerIdx = newValue;
+	}
 }

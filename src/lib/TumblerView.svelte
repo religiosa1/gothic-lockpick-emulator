@@ -22,14 +22,18 @@
 
 <style>
 	.tumbler {
-		display: inline-flex;
+		--transition-props: 80ms ease-in;
+		display: flex;
 		flex-flow: row nowrap;
+		width: max-content;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 		background: lightblue;
 		--offset: attr(data-offset type(<number>), 0);
 		margin-left: calc(var(--pin-width) * var(--offset));
+		transition: var(--transition-props);
+		transition-property: margin-left;
 	}
 	.pin {
 		flex-shrink: 0;
@@ -50,6 +54,8 @@
 		height: 80%;
 		margin: auto;
 		background: black;
+		transition: var(--transition-props);
+		transition-property: background-color;
 	}
 	.pin.pin-current::after {
 		background: gold;
