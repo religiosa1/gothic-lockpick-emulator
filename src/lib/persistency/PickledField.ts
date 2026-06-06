@@ -1,9 +1,9 @@
-import { Field } from '$lib/models/Field.svelte';
-import { Tumbler } from '$lib/models/Tumbler.svelte';
-import type { TumblerIdx } from '$lib/models/TumblerIdx';
+import { Field } from "$lib/models/Field.svelte";
+import { Tumbler } from "$lib/models/Tumbler.svelte";
+import type { TumblerIdx } from "$lib/models/TumblerIdx";
 
 export interface PickledField {
-	_type: 'Field';
+	_type: "Field";
 	tumblerWidth: number;
 	tumblerRow: number;
 	tumblerPositions: number[];
@@ -19,17 +19,17 @@ export function pickle(field: Field): PickledField {
 	}
 
 	return {
-		_type: 'Field',
+		_type: "Field",
 		tumblerWidth: field.tumblerWidth,
 		tumblerRow: field.tumblerRow,
 		tumblerPositions: field.tumblers.map((t) => t.currentPosition),
-		dependencies
+		dependencies,
 	};
 }
 
 export function unpickle(pickled: PickledField): Field {
 	const field = new Field();
-	if (pickled['_type'] !== 'Field') {
+	if (pickled["_type"] !== "Field") {
 		throw new Error("Doesn't look to be a field that can be parsed");
 	}
 	field.nTumblers = pickled.tumblerPositions.length;

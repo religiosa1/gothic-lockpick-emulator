@@ -1,5 +1,5 @@
-import { Tumbler } from './Tumbler.svelte';
-import type { TumblerIdx } from './TumblerIdx';
+import { Tumbler } from "./Tumbler.svelte";
+import type { TumblerIdx } from "./TumblerIdx";
 
 export class Field {
 	nTumblers = 6;

@@ -1,7 +1,7 @@
-import { Field } from '$lib/models/Field.svelte';
-import * as pickledField from './PickledField';
+import { Field } from "$lib/models/Field.svelte";
+import * as pickledField from "./PickledField";
 
-const LS_KEY = 'current_lock_state';
+const LS_KEY = "current_lock_state";
 
 interface PickledLockView {
 	field: pickledField.PickledField;
@@ -13,13 +13,18 @@ interface UnpickledLockView {
 	lockName: string;
 }
 
-export function saveLockView(state: UnpickledLockView): void {
+export function pickleView(state: UnpickledLockView): PickledLockView {
 	const pickledState: PickledLockView = {
+		lockName: state.lockName,
 		field: pickledField.pickle(state.field),
-		lockName: state.lockName
 	};
+	return pickledState;
+}
+
+export function saveLockView(state: UnpickledLockView): void {
+	const pickledState = pickleView(state);
 	localStorage.setItem(LS_KEY, JSON.stringify(pickledState));
-	console.log('Saved current state');
+	console.log("Saved current state");
 }
 
 export function tryRestoreLockView(): UnpickledLockView {
@@ -30,10 +35,10 @@ export function tryRestoreLockView(): UnpickledLockView {
 		}
 		const parsed = JSON.parse(lsStr) as PickledLockView;
 		const field = pickledField.unpickle(parsed.field);
-		console.log('Restored saved lock view');
+		console.log("Restored saved lock view");
 		return { field, lockName: parsed.lockName };
 	} catch (err) {
-		console.error('Error restoring old lock view', err);
+		console.error("Error restoring old lock view", err);
 	}
 	return makeDefaultState();
 }
@@ -41,6 +46,6 @@ export function tryRestoreLockView(): UnpickledLockView {
 function makeDefaultState(): UnpickledLockView {
 	return {
 		field: new Field(),
-		lockName: 'Unnamed Lock'
+		lockName: "Unnamed Lock",
 	};
 }

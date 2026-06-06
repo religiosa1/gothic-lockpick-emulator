@@ -1,7 +1,7 @@
 <script lang="ts">
-	import TumblerView from '$lib/TumblerView.svelte';
-	import { idxToChar } from '$lib/models/TumblerIdx';
-	import { saveLockView, tryRestoreLockView } from '$lib/persistency/lockView';
+	import TumblerView from "$lib/TumblerView.svelte";
+	import { idxToChar } from "$lib/models/TumblerIdx";
+	import { pickleView, saveLockView, tryRestoreLockView } from "$lib/persistency/lockView";
 
 	const savedState = tryRestoreLockView();
 	const field = savedState.field;
@@ -10,6 +10,18 @@
 
 	function save() {
 		saveLockView({ field, lockName });
+	}
+
+	function exportView() {
+		const pickledView = pickleView({ field, lockName });
+
+		const blob = new Blob([JSON.stringify(pickledView, null, 2)]);
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = lockName + ".json";
+		a.click();
+		URL.revokeObjectURL(url);
 	}
 
 	let lockViewEl: HTMLUListElement;
@@ -29,27 +41,27 @@
 			return;
 		}
 		switch (e.key) {
-			case 'ArrowUp':
-			case 'w':
-			case 'k': {
+			case "ArrowUp":
+			case "w":
+			case "k": {
 				field.selectPrevTumbler();
 				break;
 			}
-			case 'ArrowDown':
-			case 's':
-			case 'j': {
+			case "ArrowDown":
+			case "s":
+			case "j": {
 				field.selectNextTumbler();
 				break;
 			}
-			case 'ArrowLeft':
-			case 'a':
-			case 'h': {
+			case "ArrowLeft":
+			case "a":
+			case "h": {
 				field.moveTumbler(field.selectedTumblerIdx, 1);
 				break;
 			}
-			case 'ArrowRight':
-			case 'd':
-			case 'l': {
+			case "ArrowRight":
+			case "d":
+			case "l": {
 				field.moveTumbler(field.selectedTumblerIdx, -1);
 				break;
 			}
@@ -157,6 +169,7 @@
 
 <button onclick={() => field.reset()}>Reset</button>
 <button onclick={save} type="button">Save Lock</button>
+<button onclick={exportView} type="button">Export Lock to file</button>
 
 <style>
 	:root {

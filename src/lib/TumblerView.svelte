@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Tumbler } from './models/Tumbler.svelte';
+	import type { Tumbler } from "./models/Tumbler.svelte";
 
 	interface Props {
 		tumbler: Tumbler;
@@ -47,7 +47,7 @@
 		padding: calc(var(--pin-width) * 0.1);
 	}
 	.pin::after {
-		content: '';
+		content: "";
 		display: block;
 		border-radius: 50%;
 		width: 80%;
