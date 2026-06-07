@@ -24,8 +24,8 @@
 	</thead>
 	<tbody>
 		{#each Array(field.nTumblers), idx}
-			<tr>
-				<th scope="row" class:selected={idx === field.selectedTumblerIdx}>
+			<tr class:selected-row={idx === field.selectedTumblerIdx}>
+				<th scope="row">
 					{idxToChar(idx)}
 				</th>
 				{#each Array(field.nTumblers), depIdx}
@@ -94,5 +94,14 @@
 		min-width: 2.5ch;
 		aspect-ratio: 1;
 		color: currentColor;
+	}
+	.selected-row {
+		td,
+		th {
+			background-color: var(--clr-bg-hl);
+		}
+		th {
+			color: var(--clr-hl);
+		}
 	}
 </style>

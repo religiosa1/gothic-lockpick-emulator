@@ -73,6 +73,11 @@
 
 <section class="tumblers">
 	<h3>Lock View</h3>
+	<label>
+		Number of tumblers
+		<input type="number" min="2" max="9" step="1" bind:value={field.nTumblers} />
+	</label>
+	<br />
 	<LockView {field} bind:lockViewEl />
 </section>
 
@@ -91,6 +96,10 @@
 		--clr-neg: red;
 		--clr-pos: blue;
 		--clr-hl: green;
+		/* derived vars */
+		--clr-bg-neg: hwb(from var(--clr-neg) h w b / 0.12);
+		--clr-bg-pos: hwb(from var(--clr-pos) h w b / 0.12);
+		--clr-bg-hl: hwb(from var(--clr-hl) h w b / 0.05);
 	}
 	:global {
 		.dep-pos {

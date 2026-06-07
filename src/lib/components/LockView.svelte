@@ -58,14 +58,14 @@
 		}
 	}
 	.tumblers-list__item.dep-neg {
-		background: hwb(from var(--clr-neg) h w b / 0.12);
+		background: var(--clr-bg-neg);
 	}
 	.tumblers-list__item.dep-pos {
-		background: hwb(from var(--clr-pos) h w b / 0.12);
+		background: var(--clr-bg-pos);
 	}
 	.tumblers-list__item.selected {
 		outline-color: var(--clr-hl);
 		outline: 2px solid;
-		background: hwb(from var(--clr-hl) h w b / 0.06);
+		background: var(--clr-bg-hl);
 	}
 </style>

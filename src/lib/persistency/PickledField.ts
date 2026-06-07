@@ -28,11 +28,10 @@ export function pickle(field: Field): PickledField {
 }
 
 export function unpickle(pickled: PickledField): Field {
-	const field = new Field();
 	if (pickled["_type"] !== "Field") {
 		throw new Error("Doesn't look to be a field that can be parsed");
 	}
-	field.nTumblers = pickled.tumblerPositions.length;
+	const field = new Field(pickled.tumblerPositions.length);
 	field.tumblerWidth = pickled.tumblerWidth;
 	field.tumblerRow = pickled.tumblerRow;
 

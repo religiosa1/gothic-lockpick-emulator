@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Tumbler } from "./models/Tumbler.svelte";
+	import type { Tumbler } from "../models/Tumbler.svelte";
 
 	interface Props {
 		tumbler: Tumbler;
