@@ -49,6 +49,9 @@
 			case "ArrowLeft":
 			case "a":
 			case "h": {
+				// TODO: it seems more intuitive to actually chaange the selection
+				// of the row, as you can traverse and fill out the whole table with
+				// one keu and a spacebar.
 				let newValue = horizontalSelectionIndex - 1;
 				// skipping self
 				if (newValue === field.selectedTumblerIdx) {

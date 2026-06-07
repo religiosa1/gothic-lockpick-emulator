@@ -1,5 +1,6 @@
-import { DirectionEnum } from "./models/DirectionEnum";
+import { DirectionEnum, reverseDirection } from "./models/DirectionEnum";
 import { Move } from "./models/Move";
+import { SnapshotPacker, type PackedSnapshot } from "./models/SnapshotPacker";
 import type { TumblerIdx } from "./models/TumblerIdx";
 
 interface SolverParams {
@@ -9,19 +10,22 @@ interface SolverParams {
 	tumblerRow: number;
 }
 
-/** State representation in a single integer */
-type SnapshotKey = number;
-
 export class Solver {
-	private nTumblers: number;
-	private tumblerWidth: number;
-	private dependencies: number[][];
-	private goal: TumblerIdx[];
+	private readonly packer: SnapshotPacker;
+	private readonly nTumblers: number;
+	private readonly tumblerWidth: number;
+	private readonly dependencies: number[][];
+	private readonly goal: TumblerIdx[];
 	/** Distance to solution from a possible state to solution in number of moves required */
-	private distance = new Map<SnapshotKey, number>();
-	private next = new Map<SnapshotKey, Move>();
+	private readonly distancesMap = new Map<PackedSnapshot, number>();
+	/** Next best move towards the goal */
+	private readonly nextStepsMap = new Map<PackedSnapshot, Move>();
 
 	constructor(cfg: SolverParams) {
+		this.packer = new SnapshotPacker({
+			tumblerWidth: cfg.tumblerWidth,
+			nTumblers: cfg.nTumblers,
+		});
 		this.nTumblers = cfg.nTumblers;
 		this.tumblerWidth = cfg.tumblerWidth;
 		this.dependencies = cfg.dependencies.map((r) => r.slice());
@@ -30,83 +34,84 @@ export class Solver {
 	}
 
 	isSolvable(snapshot: TumblerIdx[]): boolean {
-		return this.distance.has(this.encodeKey(snapshot));
+		return this.distancesMap.has(this.packer.pack(snapshot));
 	}
 
 	/** get optimal (fewest-move) sequence to solve, or null if unsolvable. */
-	solve(snapshot: TumblerIdx[]): Move[] | null {
-		let k = this.encodeKey(snapshot);
-		if (!this.distance.has(k)) {
-			return null;
+	solve(snapshot: TumblerIdx[]): Move[] | undefined {
+		let k = this.packer.pack(snapshot);
+		if (!this.distancesMap.has(k)) {
+			return undefined;
 		}
 
 		let s = snapshot.slice();
 		const moves: Move[] = [];
-		while (this.distance.get(k)! > 0) {
-			const m = this.next.get(k)!;
+		while (this.distancesMap.get(k)! > 0) {
+			const m = this.nextStepsMap.get(k)!;
 			moves.push(m);
 			s = this.apply(s, m)!;
-			k = this.encodeKey(s);
+			k = this.packer.pack(s);
 		}
 		return moves;
 	}
 
+	/** Amount of potential net steps stored */
+	get size(): number {
+		return this.nextStepsMap.size;
+	}
+
 	/** Optimal next move from any node */
-	hint(state: number[]): Move | null {
-		const k = this.encodeKey(state);
-		return this.distance.get(k) ? this.next.get(k)! : null;
-	}
-
-	/** Generates a unique hashable key for any tumbler snapshot. */
-	private encodeKey(s: TumblerIdx[]): number {
-		let k = 0;
-		for (let i = this.nTumblers - 1; i >= 0; i--) {
-			k = k * this.tumblerWidth + s[i];
+	hint(state: number[]): Move | undefined {
+		const k = this.packer.pack(state);
+		const distance = this.distancesMap.get(k);
+		if (distance == null || distance === 0) {
+			return undefined;
 		}
-		return k;
+		const next = this.nextStepsMap.get(k);
+		if (!next) {
+			throw new Error("Unexpected missing next step, when a distance to solve is known");
+		}
+		return next;
 	}
 
-	/** Restores key back to state */
-	// private decodeSnapshotFromKey(k: number): number[] {
-	// 	const s = new Array(this.nTumblers);
-	// 	for (let i = 0; i < this.nTumblers; i++) {
-	// 		s[i] = k % this.tumblerWidth;
-	// 		k = Math.floor(k / this.tumblerWidth);
-	// 	}
-	// 	return s;
-	// }
+	/** Basically the same as Field.move(), but without the extended error checks */
+	private apply(snapshot: TumblerIdx[], move: Move): TumblerIdx[] | undefined {
+		const dependencies = this.dependencies[move.idx];
+		const outSnapshot = snapshot.slice();
 
-	// TODO: deduplicate this logic somehow?
-	// Pure mirror of Field.moveTumbler's math + bounds. null = blocked (non-edge).
-	private apply(snapshot: TumblerIdx[], move: Move): number[] | null {
-		const d = this.dependencies[move.idx];
-		const out = snapshot.slice();
-		for (let i = 0; i < this.nTumblers; i++) {
-			out[i] = snapshot[i] + (i === move.idx ? move.direction : d[i] * move.direction);
-			if (out[i] < 0 || out[i] >= this.tumblerWidth) {
-				return null;
+		for (let idx = 0; idx < this.nTumblers; idx++) {
+			const oldValue = snapshot[idx];
+			const delta = idx === move.idx ? move.direction : dependencies[idx] * move.direction;
+			const tumblerValue = oldValue + delta;
+			if (tumblerValue < 0 || tumblerValue >= this.tumblerWidth) {
+				return undefined;
 			}
+			outSnapshot[idx] = tumblerValue;
 		}
-		return out;
+		return outSnapshot;
 	}
 
 	// One backward BFS from the goal. Graph is undirected, so this labels every
 	// solvable state with its distance and the optimal next move toward the goal.
 	private build() {
-		const q: number[][] = [this.goal];
-		this.distance.set(this.encodeKey(this.goal), 0);
+		const q: TumblerIdx[][] = [this.goal];
+		this.distancesMap.set(this.packer.pack(this.goal), 0);
 		for (let h = 0; h < q.length; h++) {
 			const s = q[h];
-			const ds = this.distance.get(this.encodeKey(s))!;
+			const ds = this.distancesMap.get(this.packer.pack(s))!;
 			for (let idx = 0; idx < this.nTumblers; idx++) {
 				for (const dir of [DirectionEnum.Left, DirectionEnum.Right]) {
 					const t = this.apply(s, new Move(idx, dir));
-					if (!t) continue;
-					const kt = this.encodeKey(t);
-					if (this.distance.has(kt)) continue;
-					this.distance.set(kt, ds + 1);
-					const toward = dir === DirectionEnum.Left ? DirectionEnum.Right : DirectionEnum.Left;
-					this.next.set(kt, new Move(idx, toward));
+					if (!t) {
+						continue;
+					}
+					const kt = this.packer.pack(t);
+					if (this.distancesMap.has(kt)) {
+						continue;
+					}
+					this.distancesMap.set(kt, ds + 1);
+					const toward = reverseDirection(dir);
+					this.nextStepsMap.set(kt, new Move(idx, toward));
 					q.push(t);
 				}
 			}

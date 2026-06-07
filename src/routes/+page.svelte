@@ -27,14 +27,22 @@
 	}
 
 	function solve() {
+		const startTs = performance.now();
 		const solver = new Solver({
 			nTumblers: field.nTumblers,
 			tumblerWidth: field.tumblerWidth,
 			tumblerRow: field.tumblerRow,
 			dependencies: field.dependencies,
 		});
+		const builtTs = performance.now();
 		const moves = solver.solve(field.snapshot());
-		console.log(moves?.map((m) => m.toString()).join("\n") ?? "non solveable");
+		const endTs = performance.now();
+		console.log(moves?.map((m) => m.toString()).join("\n") ?? "unsolvable");
+		console.log(
+			`Solved in ${endTs - startTs}, ` +
+				`solution graph built in ${builtTs - startTs}, ` +
+				`containing ${solver.size} possible steps`
+		);
 	}
 
 	let lockViewEl = $state<HTMLUListElement>();
@@ -63,14 +71,17 @@
 
 <button onclick={() => field.reset()} type="button">Reset</button>
 <button onclick={save} type="button">Save Lock</button>
-<button onclick={exportView} type="button">Export Lock to file</button>
-<button onclick={solve} type="button">Solve (WIP to console.log)</button>
-<ImportInput
-	onFileUploaded={(s) => {
-		field = s.field;
-		lockName = s.lockName;
-	}}
-/>
+<button onclick={solve} type="button">Auto-Solve (WIP to console.log)</button>
+<details>
+	<summary>Import/Export</summary>
+	<button onclick={exportView} type="button">Export Lock to a file</button>
+	<ImportInput
+		onFileUploaded={(s) => {
+			field = s.field;
+			lockName = s.lockName;
+		}}
+	/>
+</details>
 
 <style>
 	:root {
