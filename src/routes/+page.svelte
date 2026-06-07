@@ -35,9 +35,9 @@
 			dependencies: field.dependencies,
 		});
 		const builtTs = performance.now();
-		const moves = solver.solve(field.snapshot());
+		const moveStates = solver.solve(field.snapshot());
 		const endTs = performance.now();
-		console.log(moves?.map((m) => m.toString()).join("\n") ?? "unsolvable");
+		console.log(moveStates?.map((m) => m.move.toString()).join("\n") ?? "unsolvable");
 		console.log(
 			`Solved in ${endTs - startTs}, ` +
 				`solution graph built in ${builtTs - startTs}, ` +

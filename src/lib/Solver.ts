@@ -10,6 +10,13 @@ interface SolverParams {
 	tumblerRow: number;
 }
 
+/** Move command, with the resulting state of the command application for
+ * undo-redo list */
+export interface MoveState {
+	move: Move;
+	state: PackedSnapshot;
+}
+
 export class Solver {
 	private readonly packer: SnapshotPacker;
 	private readonly nTumblers: number;
@@ -38,21 +45,21 @@ export class Solver {
 	}
 
 	/** get optimal (fewest-move) sequence to solve, or null if unsolvable. */
-	solve(snapshot: TumblerIdx[]): Move[] | undefined {
+	solve(snapshot: TumblerIdx[]): MoveState[] | undefined {
 		let k = this.packer.pack(snapshot);
 		if (!this.distancesMap.has(k)) {
 			return undefined;
 		}
 
 		let s = snapshot.slice();
-		const moves: Move[] = [];
+		const movesStates: MoveState[] = [];
 		while (this.distancesMap.get(k)! > 0) {
 			const m = this.nextStepsMap.get(k)!;
-			moves.push(m);
+			movesStates.push({ move: m, state: k });
 			s = this.apply(s, m)!;
 			k = this.packer.pack(s);
 		}
-		return moves;
+		return movesStates;
 	}
 
 	/** Amount of potential net steps stored */

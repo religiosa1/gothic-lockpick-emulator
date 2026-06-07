@@ -23,12 +23,16 @@ export class Field {
 		this.#nTumblers = v;
 		if (old < v) {
 			for (let i = old; i < v; i++) {
+				// Extending length of old deps arrays
+				for (const dep of this.dependencies) {
+					dep.push(0);
+				}
 				this.tumblers.push(new Tumbler(this.tumblerRow));
-				this.dependencies.push(new Array(v).fill(0));
+				const depArray = new Array(this.#nTumblers).fill(0);
+				this.dependencies.push(depArray);
 			}
 		} else if (old > v) {
 			this.tumblers.length = v;
-			this.dependencies.length = v;
 		}
 	}
 

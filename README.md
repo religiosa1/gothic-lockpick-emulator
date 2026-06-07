@@ -1,4 +1,4 @@
-# Gothic Remake lockpicking minigame emulator and auto-solver
+# Gothic Remake lockpicking emulator and auto-solver
 
 While playing the new [Gothic Remake](https://gothic.thqnordic.com/) game and
 encountering the lockpicking mini-game puzzle, I understood that I'm not
@@ -95,4 +95,4 @@ npm run dev -- --open
 
 ## License
 
-gothic-lockpicking-emulator is MIT licensed.
+gothic-lockpick-emulator is MIT licensed.
