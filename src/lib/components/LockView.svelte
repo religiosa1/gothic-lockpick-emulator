@@ -28,7 +28,7 @@
 			class:dep-pos={depExpression > 0}
 			onclick={() => (field.selectedTumblerIdx = idx)}
 		>
-			<TumblerView {tumbler} width={field.tumblerWidth} targetRow={field.tumblerRow} />
+			<TumblerView {tumbler} width={field.tumblerWidth} targetRow={field.tumblerRow} {idx} />
 		</li>
 	{/each}
 </ul>

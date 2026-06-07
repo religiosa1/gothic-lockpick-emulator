@@ -5,12 +5,40 @@
 		tumbler: Tumbler;
 		width: number;
 		targetRow: number;
+		idx: number;
 	}
-	let { tumbler, width, targetRow }: Props = $props();
+	let { tumbler, width, targetRow, idx }: Props = $props();
 	let offset = $derived(width - tumbler.currentPosition - 1);
+
+	$effect(() => {});
 </script>
 
-<ul data-pos={tumbler.currentPosition} data-offset={offset} class="tumbler">
+<ul
+	data-pos={tumbler.currentPosition}
+	data-offset={offset}
+	class="tumbler"
+	{@attach (el) => {
+		const ac = new AbortController();
+		document.addEventListener(
+			"failed-tumbler-move",
+			(e) => {
+				if (!e.detail.indexes.includes(idx)) {
+					return;
+				}
+				el.style.animation = "tumbler-shake 1s";
+				el.addEventListener(
+					"animationend",
+					() => {
+						el.style.animation = "";
+					},
+					{ once: true }
+				);
+			},
+			{ signal: ac.signal }
+		);
+		return () => ac.abort();
+	}}
+>
 	{#each Array(width), idx}
 		<li
 			class="pin"
@@ -65,5 +93,45 @@
 	}
 	.pin-current.pin-target::after {
 		background: red;
+	}
+
+	:global {
+		@keyframes tumbler-shake {
+			0%,
+			100% {
+				rotate: 0deg;
+				translate: 0 0;
+				outline: 1px solid red;
+			}
+			10% {
+				rotate: -1deg;
+			}
+			20% {
+				rotate: 1deg;
+			}
+			30% {
+				rotate: -1deg;
+				translate: 1px 0;
+			}
+			40% {
+				rotate: 1deg;
+			}
+			50% {
+				rotate: -1deg;
+			}
+			60% {
+				rotate: 1deg;
+				translate: -1px 0;
+			}
+			70% {
+				rotate: -1deg;
+			}
+			80% {
+				rotate: 1deg;
+			}
+			90% {
+				rotate: -1deg;
+			}
+		}
 	}
 </style>

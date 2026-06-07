@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DepTable from "$lib/components/DepTable.svelte";
+	import GlobalKeyHandler from "$lib/components/GlobalKeyHandler.svelte";
 	import LockView from "$lib/components/LockView.svelte";
 	import { pickleView, saveLockView, tryRestoreLockView } from "$lib/persistency/lockView";
 
@@ -27,47 +28,9 @@
 	let lockViewEl = $state<HTMLUListElement>();
 </script>
 
-<h1>Gothic Lockpicking Emulator</h1>
+<GlobalKeyHandler {field} {lockViewEl} />
 
-<svelte:document
-	onkeydown={(e) => {
-		// preventing tumblers moving on input to the header and such --
-		// not processing click events by early return
-		if (
-			document.activeElement !== document.body &&
-			document.activeElement !== lockViewEl &&
-			!lockViewEl?.contains(document.activeElement)
-		) {
-			return;
-		}
-		switch (e.key) {
-			case "ArrowUp":
-			case "w":
-			case "k": {
-				field.selectPrevTumbler();
-				break;
-			}
-			case "ArrowDown":
-			case "s":
-			case "j": {
-				field.selectNextTumbler();
-				break;
-			}
-			case "ArrowLeft":
-			case "a":
-			case "h": {
-				field.moveTumbler(field.selectedTumblerIdx, 1);
-				break;
-			}
-			case "ArrowRight":
-			case "d":
-			case "l": {
-				field.moveTumbler(field.selectedTumblerIdx, -1);
-				break;
-			}
-		}
-	}}
-/>
+<h1>Gothic Lockpicking Emulator</h1>
 
 <h2 contenteditable bind:textContent={lockName}></h2>
 
