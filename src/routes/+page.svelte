@@ -3,6 +3,7 @@
 	import GlobalKeyHandler from "$lib/components/GlobalKeyHandler.svelte";
 	import LockView from "$lib/components/LockView.svelte";
 	import { pickleView, saveLockView, tryRestoreLockView } from "$lib/persistency/lockView";
+	import { Solver } from "$lib/Solver";
 
 	const savedState = tryRestoreLockView();
 	const field = savedState.field;
@@ -23,6 +24,17 @@
 		a.download = lockName + ".json";
 		a.click();
 		URL.revokeObjectURL(url);
+	}
+
+	function solve() {
+		const solver = new Solver({
+			nTumblers: field.nTumblers,
+			tumblerWidth: field.tumblerWidth,
+			tumblerRow: field.tumblerRow,
+			dependencies: field.dependencies,
+		});
+		const moves = solver.solve(field.snapshot());
+		console.log(moves?.map((m) => m.toString()).join("\n") ?? "non solveable");
 	}
 
 	let lockViewEl = $state<HTMLUListElement>();
@@ -49,9 +61,10 @@
 	<DepTable {field} />
 </section>
 
-<button onclick={() => field.reset()}>Reset</button>
+<button onclick={() => field.reset()} type="button">Reset</button>
 <button onclick={save} type="button">Save Lock</button>
 <button onclick={exportView} type="button">Export Lock to file</button>
+<button onclick={solve} type="button">Solve (WIP to console.log)</button>
 
 <style>
 	:root {

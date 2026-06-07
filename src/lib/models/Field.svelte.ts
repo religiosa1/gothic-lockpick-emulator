@@ -5,6 +5,9 @@ import type { TumblerIdx } from "./TumblerIdx";
 export class Field {
 	tumblerWidth = 7;
 	tumblerRow = 3; // zero-based
+	tumblers = $state<Tumbler[]>([]);
+	dependencies = $state<number[][]>([]);
+
 	#nTumblers = $state(6);
 	get nTumblers() {
 		return this.#nTumblers;
@@ -30,9 +33,6 @@ export class Field {
 	}
 
 	selectedTumblerIdx = $state<TumblerIdx>(0);
-
-	tumblers = $state<Tumbler[]>([]);
-	dependencies = $state<number[][]>([]);
 
 	constructor(nTumblers = 6) {
 		this.#nTumblers = nTumblers;
@@ -91,5 +91,10 @@ export class Field {
 			newValue = 0;
 		}
 		this.selectedTumblerIdx = newValue;
+	}
+
+	/** Capture current tumblers state as just an array of their positions */
+	snapshot(): TumblerIdx[] {
+		return this.tumblers.map((t) => t.currentPosition);
 	}
 }
