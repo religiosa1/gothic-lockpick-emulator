@@ -1,13 +1,13 @@
 <script lang="ts">
 	import DepTable from "$lib/components/DepTable.svelte";
 	import GlobalKeyHandler from "$lib/components/GlobalKeyHandler.svelte";
+	import ImportInput from "$lib/components/ImportInput.svelte";
 	import LockView from "$lib/components/LockView.svelte";
 	import { pickleView, saveLockView, tryRestoreLockView } from "$lib/persistency/lockView";
 	import { Solver } from "$lib/Solver";
 
 	const savedState = tryRestoreLockView();
-	const field = savedState.field;
-
+	let field = $state(savedState.field);
 	let lockName = $state(savedState.lockName);
 
 	function save() {
@@ -65,6 +65,12 @@
 <button onclick={save} type="button">Save Lock</button>
 <button onclick={exportView} type="button">Export Lock to file</button>
 <button onclick={solve} type="button">Solve (WIP to console.log)</button>
+<ImportInput
+	onFileUploaded={(s) => {
+		field = s.field;
+		lockName = s.lockName;
+	}}
+/>
 
 <style>
 	:root {

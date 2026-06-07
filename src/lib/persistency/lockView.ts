@@ -8,7 +8,7 @@ interface PickledLockView {
 	lockName: string;
 }
 
-interface UnpickledLockView {
+export interface UnpickledLockView {
 	field: Field;
 	lockName: string;
 }
@@ -27,16 +27,30 @@ export function saveLockView(state: UnpickledLockView): void {
 	console.log("Saved current state");
 }
 
+export function restoreFromJson(jsonValue: string): UnpickledLockView {
+	const parsed = JSON.parse(jsonValue) as PickledLockView;
+	if (typeof parsed !== "object") {
+		throw new Error(
+			"expecting a json string containing an object with representation " +
+				`of lock view, got ${typeof parsed} instead`
+		);
+	}
+	const field = pickledField.unpickle(parsed.field);
+	if (typeof parsed.lockName !== "string") {
+		parsed.lockName = "Unnamed Lock";
+	}
+	return { field, lockName: parsed.lockName };
+}
+
 export function tryRestoreLockView(): UnpickledLockView {
 	try {
 		const lsStr = localStorage.getItem(LS_KEY);
 		if (!lsStr) {
 			return makeDefaultState();
 		}
-		const parsed = JSON.parse(lsStr) as PickledLockView;
-		const field = pickledField.unpickle(parsed.field);
+		const state = restoreFromJson(lsStr);
 		console.log("Restored saved lock view");
-		return { field, lockName: parsed.lockName };
+		return state;
 	} catch (err) {
 		console.error("Error restoring old lock view", err);
 	}
