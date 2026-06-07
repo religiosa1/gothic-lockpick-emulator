@@ -21,8 +21,8 @@ later. It will still look like ass, but maybe will be more usable.
   game;
 - In the game, move each tumbler, to see which tumbler moves along with it,
   mark such tumblers in the "Dependencies" table in the app (`+` = moves in the
-  same dir, `-` in the opposite)
-- Click `Save Lock` in the app
+  same dir, `-` in the opposite);
+- Click `Save Lock` in the app;
 - Click `auto-solve` and press "F12" and then "console", to see the list of
   steps you need to perform to solve the lock.
 
