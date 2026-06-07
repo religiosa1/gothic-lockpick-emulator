@@ -26,7 +26,8 @@
 		URL.revokeObjectURL(url);
 	}
 
-	function solve() {
+	let isSolving = $state(false);
+	async function solve() {
 		const startTs = performance.now();
 		const solver = new Solver({
 			nTumblers: field.nTumblers,
@@ -34,15 +35,21 @@
 			tumblerRow: field.tumblerRow,
 			dependencies: field.dependencies,
 		});
-		const builtTs = performance.now();
-		const moveStates = solver.solve(field.snapshot());
-		const endTs = performance.now();
-		console.log(moveStates?.map((m) => m.move.toString()).join("\n") ?? "unsolvable");
-		console.log(
-			`Solved in ${endTs - startTs}, ` +
-				`solution graph built in ${builtTs - startTs}, ` +
-				`containing ${solver.size} possible steps`
-		);
+		isSolving = true;
+		try {
+			await solver.build();
+			const builtTs = performance.now();
+			const moveStates = solver.solve(field.snapshot());
+			const endTs = performance.now();
+			console.log(moveStates?.map((m) => m.move.toString()).join("\n") ?? "unsolvable");
+			console.log(
+				`Solved in ${endTs - startTs}, ` +
+					`solution graph built in ${builtTs - startTs}, ` +
+					`containing ${solver.size} possible steps`
+			);
+		} finally {
+			isSolving = false;
+		}
 	}
 
 	let lockViewEl = $state<HTMLUListElement>();
@@ -71,7 +78,11 @@
 
 <button onclick={() => field.reset()} type="button">Reset</button>
 <button onclick={save} type="button">Save Lock</button>
-<button onclick={solve} type="button">Auto-Solve (WIP to console.log)</button>
+{#if isSolving}
+	<button disabled type="button">Thinking...</button>
+{:else}
+	<button onclick={solve} type="button">Auto-Solve (WIP to console.log)</button>
+{/if}
 <details>
 	<summary>Import/Export</summary>
 	<button onclick={exportView} type="button">Export Lock to a file</button>

@@ -28,6 +28,8 @@ export class Solver {
 	/** Next best move towards the goal */
 	private readonly nextStepsMap = new Map<PackedSnapshot, Move>();
 
+	private isBuilt = false;
+
 	constructor(cfg: SolverParams) {
 		this.packer = new SnapshotPacker({
 			tumblerWidth: cfg.tumblerWidth,
@@ -37,15 +39,64 @@ export class Solver {
 		this.tumblerWidth = cfg.tumblerWidth;
 		this.dependencies = cfg.dependencies.map((r) => r.slice());
 		this.goal = new Array(cfg.nTumblers).fill(cfg.tumblerRow);
-		this.build();
+	}
+
+	// One backward BFS from the goal. Graph is undirected, so this labels every
+	// solvable state with its distance and the optimal next move toward the goal.
+	async build(): Promise<void> {
+		const yieldToMain = () =>
+			globalThis.scheduler?.yield?.() ?? new Promise((r) => setTimeout(r, 0));
+
+		// time budget before yielding back to scheduler
+		let deadline = performance.now() + 50;
+
+		// ever-growing queue to avoid costly shifts, headIdx points to the item being processed
+		const queue: Array<TumblerIdx[]> = [this.goal];
+		this.distancesMap.set(this.packer.pack(this.goal), 0);
+		for (let headIdx = 0; headIdx < queue.length; headIdx++) {
+			const headSnapshot = queue[headIdx];
+			const distance = this.distancesMap.get(this.packer.pack(headSnapshot));
+			if (distance == null) {
+				throw new Error("Unexpected empty distance for a just processed item");
+			}
+			for (let tumblerIdx = 0; tumblerIdx < this.nTumblers; tumblerIdx++) {
+				// scheduler.yield shenanigans cost us more than  twice the execution
+				// time, but at least we're not blocking the main thread; 300ms -> 700ms
+				if (performance.now() > deadline) {
+					await yieldToMain();
+					deadline = performance.now() + 50;
+				}
+				for (const direction of [DirectionEnum.Left, DirectionEnum.Right]) {
+					const neighbor = this.apply(headSnapshot, new Move(tumblerIdx, direction));
+					if (!neighbor) {
+						continue;
+					}
+					const neighborKey = this.packer.pack(neighbor);
+					if (this.distancesMap.has(neighborKey)) {
+						continue;
+					}
+					this.distancesMap.set(neighborKey, distance + 1);
+					const towardGoal = reverseDirection(direction);
+					this.nextStepsMap.set(neighborKey, new Move(tumblerIdx, towardGoal));
+					queue.push(neighbor);
+				}
+			}
+		}
+		this.isBuilt = true;
 	}
 
 	isSolvable(snapshot: TumblerIdx[]): boolean {
+		if (!this.isBuilt) {
+			throw new Error("build method must be called first, to build a map of solutions");
+		}
 		return this.distancesMap.has(this.packer.pack(snapshot));
 	}
 
 	/** get optimal (fewest-move) sequence to solve, or null if unsolvable. */
 	solve(snapshot: TumblerIdx[]): MoveState[] | undefined {
+		if (!this.isBuilt) {
+			throw new Error("build method must be called first, to build a map of solutions");
+		}
 		let k = this.packer.pack(snapshot);
 		if (!this.distancesMap.has(k)) {
 			return undefined;
@@ -69,6 +120,9 @@ export class Solver {
 
 	/** Optimal next move from any node */
 	hint(state: number[]): Move | undefined {
+		if (!this.isBuilt) {
+			throw new Error("build method must be called first, to build a map of solutions");
+		}
 		const k = this.packer.pack(state);
 		const distance = this.distancesMap.get(k);
 		if (distance == null || distance === 0) {
@@ -96,32 +150,5 @@ export class Solver {
 			outSnapshot[idx] = tumblerValue;
 		}
 		return outSnapshot;
-	}
-
-	// One backward BFS from the goal. Graph is undirected, so this labels every
-	// solvable state with its distance and the optimal next move toward the goal.
-	private build() {
-		const q: TumblerIdx[][] = [this.goal];
-		this.distancesMap.set(this.packer.pack(this.goal), 0);
-		for (let h = 0; h < q.length; h++) {
-			const s = q[h];
-			const ds = this.distancesMap.get(this.packer.pack(s))!;
-			for (let idx = 0; idx < this.nTumblers; idx++) {
-				for (const dir of [DirectionEnum.Left, DirectionEnum.Right]) {
-					const t = this.apply(s, new Move(idx, dir));
-					if (!t) {
-						continue;
-					}
-					const kt = this.packer.pack(t);
-					if (this.distancesMap.has(kt)) {
-						continue;
-					}
-					this.distancesMap.set(kt, ds + 1);
-					const toward = reverseDirection(dir);
-					this.nextStepsMap.set(kt, new Move(idx, toward));
-					q.push(t);
-				}
-			}
-		}
 	}
 }
