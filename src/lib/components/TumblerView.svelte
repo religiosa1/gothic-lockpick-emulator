@@ -89,7 +89,7 @@
 		background: gold;
 	}
 	.pin-target::after {
-		background: #660000;
+		background: #aa0000;
 	}
 	.pin-current.pin-target::after {
 		background: red;

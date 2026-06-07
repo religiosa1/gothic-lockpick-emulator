@@ -1,3 +1,4 @@
+import { Move } from "./Move";
 import { Tumbler } from "./Tumbler.svelte";
 import type { TumblerIdx } from "./TumblerIdx";
 
@@ -51,15 +52,13 @@ export class Field {
 		this.dependencies.forEach((dep) => dep.fill(0));
 	}
 
-	moveTumbler(idx: TumblerIdx, direction: number): TumblerIdx[] {
-		direction = Math.min(Math.max(direction, -1), 1);
-
-		const deps = this.dependencies[idx];
+	moveTumbler(move: Move): TumblerIdx[] {
+		const deps = this.dependencies[move.idx];
 		const newPositions = this.tumblers.map((t, i) => {
-			if (i === idx) {
-				return t.currentPosition + direction;
+			if (i === move.idx) {
+				return t.currentPosition + move.direction;
 			}
-			return t.currentPosition + deps[i] * direction;
+			return t.currentPosition + deps[i] * move.direction;
 		});
 
 		const blockingTumblerIdxs: TumblerIdx[] = [];

@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { DirectionEnum } from "$lib/models/DirectionEnum";
 	import { FAILED_TUMBLER_MOVE_EVENT_NAME } from "$lib/models/FailedMoveEvent";
 	import type { Field } from "$lib/models/Field.svelte";
+	import { Move } from "$lib/models/Move";
 
 	interface Props {
 		field: Field;
@@ -48,14 +50,14 @@
 			case "ArrowLeft":
 			case "a":
 			case "h": {
-				const failed = field.moveTumbler(field.selectedTumblerIdx, 1);
+				const failed = field.moveTumbler(new Move(field.selectedTumblerIdx, DirectionEnum.Left));
 				dispatchFailedUpdatesEvent(failed);
 				break;
 			}
 			case "ArrowRight":
 			case "d":
 			case "l": {
-				const failed = field.moveTumbler(field.selectedTumblerIdx, -1);
+				const failed = field.moveTumbler(new Move(field.selectedTumblerIdx, DirectionEnum.Right));
 				dispatchFailedUpdatesEvent(failed);
 				break;
 			}

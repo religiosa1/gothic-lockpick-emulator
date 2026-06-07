@@ -6,11 +6,80 @@
 		field: Field;
 	}
 	let { field }: Props = $props();
+
+	let table: HTMLTableElement;
+	let tbody: HTMLTableSectionElement;
+	let horizontalSelectionIndex = $state(0);
+	$effect(() => {
+		const x = horizontalSelectionIndex;
+		const y = field.selectedTumblerIdx;
+		if (document.activeElement !== table && !table?.contains(document.activeElement)) {
+			return;
+		}
+		const getEl = (x: number, y: number) => {
+			const selector = `[data-idx="${y}"] [data-depidx="${x}"] button`;
+			return tbody?.querySelector(selector) as HTMLButtonElement | null;
+		};
+		let button = getEl(x, y);
+		// TODO: search again here, for cases when we hit a diag
+		button?.focus();
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<table class="deptable" tabindex="0">
+<table
+	bind:this={table}
+	class="deptable"
+	tabindex="0"
+	onkeydown={(e) => {
+		switch (e.key) {
+			case "ArrowUp":
+			case "w":
+			case "k": {
+				field.selectPrevTumbler();
+				break;
+			}
+			case "ArrowDown":
+			case "s":
+			case "j": {
+				field.selectNextTumbler();
+				break;
+			}
+			case "ArrowLeft":
+			case "a":
+			case "h": {
+				let newValue = horizontalSelectionIndex - 1;
+				// skipping self
+				if (newValue === field.selectedTumblerIdx) {
+					newValue--;
+				}
+				if (newValue < 0) {
+					newValue =
+						field.selectedTumblerIdx === field.nTumblers - 1
+							? field.nTumblers - 2
+							: field.nTumblers - 1;
+				}
+				horizontalSelectionIndex = newValue;
+				break;
+			}
+			case "ArrowRight":
+			case "d":
+			case "l": {
+				let newValue = horizontalSelectionIndex + 1;
+				// skipping self
+				if (newValue === field.selectedTumblerIdx) {
+					newValue++;
+				}
+				if (newValue >= field.nTumblers) {
+					newValue = field.selectedTumblerIdx === 0 ? 1 : 0;
+				}
+				horizontalSelectionIndex = newValue;
+				break;
+			}
+		}
+	}}
+>
 	<thead>
 		<tr>
 			<th>sel</th>
@@ -22,9 +91,9 @@
 			{/each}
 		</tr>
 	</thead>
-	<tbody>
+	<tbody bind:this={tbody}>
 		{#each Array(field.nTumblers), idx}
-			<tr class:selected-row={idx === field.selectedTumblerIdx}>
+			<tr data-idx={idx} class:selected-row={idx === field.selectedTumblerIdx}>
 				<th scope="row">
 					{idxToChar(idx)}
 				</th>
@@ -33,11 +102,18 @@
 						<td>⨯</td>
 					{:else}
 						{@const expression = field.dependencies[idx][depIdx]}
-						<td class="dep-cell" class:dep-pos={expression > 0} class:dep-neg={expression < 0}>
+						<td
+							data-depidx={depIdx}
+							class="dep-cell"
+							class:dep-pos={expression > 0}
+							class:dep-neg={expression < 0}
+						>
 							<button
 								class="dep-cell__btn"
 								type="button"
 								onclick={(e) => {
+									// TODO: also move field selected item and horizontalSelectionIndex
+									// here
 									const newValue = (() => {
 										switch (expression) {
 											case 1:
