@@ -30,31 +30,31 @@
 	let lockViewEl = $state<HTMLUListElement>();
 </script>
 
-<h1>Gothic Lockpicking Emulator</h1>
-
 <h2 contenteditable bind:textContent={lockName}></h2>
-
-<section class="tumblers">
-	<h3>Lock View</h3>
-	<label>
-		Number of tumblers
-		<input type="number" min="2" max="9" step="1" bind:value={field.nTumblers} />
-	</label>
-	<br />
-	<LockView {field} bind:lockViewEl />
-</section>
-
-<section class="dependencies">
-	<h3>Dependecies table</h3>
-	<DepTable {field} {globalState} />
-</section>
-
-<section class="undo-list">
-	<h3>Solution steps</h3>
-	<SolutionManager {field} {lockViewEl} bind:globalState />
-</section>
-
 <button onclick={save} type="button">Save Lock</button>
+
+<article>
+	<section class="lock-view">
+		<h3>Lock View</h3>
+		<label>
+			Number of tumblers
+			<input type="number" min="2" max="9" step="1" bind:value={field.nTumblers} />
+		</label>
+		<br />
+		<LockView {field} bind:lockViewEl />
+	</section>
+
+	<section class="dependencies">
+		<h3>Dependecies table</h3>
+		<DepTable {field} {globalState} />
+	</section>
+
+	<section class="solution">
+		<h3>Solution steps</h3>
+		<SolutionManager {field} {lockViewEl} bind:globalState />
+	</section>
+</article>
+
 <details>
 	<summary>Import/Export</summary>
 	<button onclick={exportView} type="button">Export Lock to a file</button>
@@ -77,6 +77,9 @@
 		--clr-bg-pos: hwb(from var(--clr-pos) h w b / 0.12);
 		--clr-bg-hl: hwb(from var(--clr-hl) h w b / 0.05);
 	}
+	h2 {
+		margin-top: 0;
+	}
 	:global {
 		.dep-pos {
 			color: var(--clr-pos);
@@ -87,5 +90,44 @@
 		.selected {
 			color: var(--clr-hl);
 		}
+	}
+	article {
+		position: relative;
+		display: grid;
+		grid-template-areas: "lock deps solution";
+		@media (width < 80ch) {
+			grid-template-areas:
+				"lock solution"
+				"deps solution";
+		}
+		@media (width < 54ch) {
+			grid-template-areas:
+				"lock"
+				"deps"
+				"solution";
+		}
+	}
+	.lock-view {
+		grid-area: lock;
+		position: sticky;
+		z-index: 10;
+		top: 0;
+		background-color: var(--clr-bg);
+		container-type: scroll-state;
+	}
+	@container scroll-state(stuck: top) {
+		@media (width < 54ch) {
+			.lock-view::after {
+				content: "";
+				display: block;
+				border-bottom: 1px solid black;
+			}
+		}
+	}
+	.dependencies {
+		grid-area: deps;
+	}
+	.solution {
+		grid-area: solution;
 	}
 </style>

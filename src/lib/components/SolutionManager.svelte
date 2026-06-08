@@ -160,7 +160,12 @@
 					? GlobalEditorStateEnum.lockCreation
 					: GlobalEditorStateEnum.solving;
 			if (newValue === GlobalEditorStateEnum.lockCreation) {
-				if (moveStates.length && !confirm("You will lose the progress you made. Are you sure?")) {
+				if (
+					moveStates.length &&
+					!confirm(
+						"You will lose the moves you made and go back to editing the lock. Are you sure?"
+					)
+				) {
 					e.preventDefault();
 					return;
 				}
