@@ -7,6 +7,7 @@
 	import type { Move } from "$lib/models/Move";
 	import { SnapshotPacker } from "$lib/models/SnapshotPacker";
 	import { Solver } from "$lib/Solver";
+	import Toggle from "./Toggle.svelte";
 
 	interface Props {
 		field: Field;
@@ -97,10 +98,14 @@
 		moveStates.push(newMoveState);
 	}
 
-	function reset() {
+	function reset(clearState: boolean) {
 		field.reset();
-		historyOffset = 0;
-		moveStates.length = 0;
+		if (clearState) {
+			historyOffset = -1;
+			moveStates.length = 0;
+		} else {
+			historyOffset = moveStates.length || -1;
+		}
 	}
 
 	async function solve() {
@@ -146,10 +151,9 @@
 	{onMoveRequested}
 />
 
-<label>
+<label class="toggle-label">
 	Editing Lock
-	<input
-		type="checkbox"
+	<Toggle
 		disabled={globalState === GlobalEditorStateEnum.autoSolving}
 		checked={globalState === GlobalEditorStateEnum.solving}
 		indeterminate={globalState !== GlobalEditorStateEnum.solving &&
@@ -169,7 +173,7 @@
 					e.preventDefault();
 					return;
 				}
-				reset();
+				reset(true);
 			} else {
 				field.saveSnapshotAsInitialState();
 			}
@@ -178,6 +182,10 @@
 	/>
 	Solving
 </label>
+
+<button onclick={() => reset(true)} type="button" disabled={nonSolvingState || !moveStates.length}>
+	Reset
+</button>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -192,6 +200,8 @@
 			case "k": {
 				if (currentHistoryIdx > 0) {
 					restoreState(currentHistoryIdx - 1);
+				} else {
+					reset(false);
 				}
 				break;
 			}
@@ -212,14 +222,19 @@
 			}
 			// TODO: replace that with tinykeys and the proper gg
 			case "g": {
-				if (moveStates.length) {
-					restoreState(0);
-				}
+				reset(false);
 				break;
 			}
 		}
 	}}
 >
+	{#if globalState === GlobalEditorStateEnum.solving}
+		<li class="solution-list__item initial" class:current={currentHistoryIdx === -1}>
+			<button class="history-state-btn" type="button" onclick={() => reset(false)}>
+				Initial state
+			</button>
+		</li>
+	{/if}
 	{#each moveStates as state, idx}
 		<li
 			class="solution-list__item"
@@ -244,9 +259,6 @@
 		</li>
 	{/each}
 </ul>
-<button onclick={reset} type="button" disabled={nonSolvingState || !moveStates.length}>
-	Reset
-</button>
 
 {#if globalState !== GlobalEditorStateEnum.autoSolving}
 	<button onclick={solve} type="button">Auto-Solve</button>
@@ -266,21 +278,25 @@
 		padding: 0;
 		&::before {
 			content: counter(steps) ". ";
-			counter-increment: steps;
 			display: inline-block;
 			text-align: right;
 			margin-right: 0.3em;
 			min-width: 3.2ch;
 		}
-		/* After initial state is added to the list: 
 		&::after {
 			content: "";
 			counter-increment: steps;
-		} */
+		}
+	}
+	.solution-list__item.initial::before {
+		content: "";
 	}
 	.solution-list__item:not(.repeated) {
 		counter-reset: repeated-steps;
 		counter-increment: repeated-steps;
+	}
+	.solution-list__item.repeated .history-state-btn {
+		margin-left: 0.5em;
 	}
 	.repeated .history-state-btn::after {
 		counter-increment: repeated-steps;
@@ -306,5 +322,10 @@
 	.history-state-btn {
 		all: unset;
 		cursor: pointer;
+	}
+
+	.toggle-label {
+		display: inline-flex;
+		align-items: center;
 	}
 </style>
