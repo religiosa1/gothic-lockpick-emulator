@@ -38,6 +38,13 @@
 				"header"
 				"main"
 				"footer";
+			font-family:
+				Roboto,
+				"Segoe UI",
+				-apple-system,
+				Helvetica,
+				Arial,
+				sans-serif;
 			font-size: 16px;
 			grid-template-rows: auto 1fr auto;
 			min-height: 100vh;

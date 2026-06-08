@@ -190,6 +190,7 @@
 		background: none;
 		border: none;
 		color: currentColor;
+		font-size: 1.2rem;
 	}
 	.dep-cell__btn:disabled {
 		cursor: not-allowed;

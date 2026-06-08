@@ -226,6 +226,7 @@
 			class:undone={idx > currentHistoryIdx}
 			class:current={idx === currentHistoryIdx}
 			class:solved={state.state === solvedState}
+			class:repeated={idx > 0 && state.move.isSame(moveStates[idx - 1].move)}
 		>
 			<button
 				class="history-state-btn"
@@ -258,10 +259,32 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		counter-reset: steps;
 	}
 	.solution-list__item {
-		margin: 0;
-		padding: 0 0 0 1em;
+		margin: 0.2em 0;
+		padding: 0;
+		&::before {
+			content: counter(steps) ". ";
+			counter-increment: steps;
+			display: inline-block;
+			text-align: right;
+			margin-right: 0.3em;
+			min-width: 3.2ch;
+		}
+		/* After initial state is added to the list: 
+		&::after {
+			content: "";
+			counter-increment: steps;
+		} */
+	}
+	.solution-list__item:not(.repeated) {
+		counter-reset: repeated-steps;
+		counter-increment: repeated-steps;
+	}
+	.repeated .history-state-btn::after {
+		counter-increment: repeated-steps;
+		content: " ×" counter(repeated-steps);
 	}
 	.undone {
 		opacity: 0.6;
@@ -273,12 +296,12 @@
 	.solved {
 		color: var(--clr-pos);
 	}
-	.current::before {
+	.current::after {
 		content: "▸";
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: 0;
+		left: -1em;
 	}
 	.history-state-btn {
 		all: unset;
