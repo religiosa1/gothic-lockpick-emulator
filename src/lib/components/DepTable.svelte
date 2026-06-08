@@ -176,17 +176,19 @@
 			border: 1px solid lightgray;
 		}
 	}
-	.dep-cell {
+	.deptable :is(td, th) {
 		padding: 0;
+		width: var(--pin-size);
+		height: var(--pin-size);
+		position: relative;
 	}
 	.dep-cell__btn {
 		cursor: pointer;
 		display: block;
-		height: 1.2em;
+		position: absolute;
+		inset: 0;
 		background: none;
 		border: none;
-		min-width: 2.5ch;
-		aspect-ratio: 1;
 		color: currentColor;
 	}
 	.dep-cell__btn:disabled {

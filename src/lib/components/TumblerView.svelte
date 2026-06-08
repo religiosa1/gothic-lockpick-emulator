@@ -59,7 +59,7 @@
 		list-style: none;
 		background: lightblue;
 		--offset: attr(data-offset type(<number>), 0);
-		margin-left: calc(var(--pin-width) * var(--offset));
+		margin-left: calc(var(--pin-size) * var(--offset));
 		transition: var(--transition-props);
 		transition-property: margin-left;
 	}
@@ -69,10 +69,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: var(--pin-width);
+		width: var(--pin-size);
 		aspect-ratio: 1;
 		box-sizing: border-box;
-		padding: calc(var(--pin-width) * 0.1);
+		padding: calc(var(--pin-size) * 0.1);
 	}
 	.pin::after {
 		content: "";

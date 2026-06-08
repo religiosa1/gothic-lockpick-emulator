@@ -36,11 +36,19 @@
 <article>
 	<section class="lock-view">
 		<h3>Lock View</h3>
-		<label>
+		<!-- We're setting this input to the height of "pin", so both tumblers 
+     and dep cells are aligned on desktop -->
+		<label class="n-tumblers">
 			Number of tumblers
-			<input type="number" min="2" max="9" step="1" bind:value={field.nTumblers} />
+			<input
+				class="n-tumblers__input"
+				type="number"
+				min="2"
+				max="9"
+				step="1"
+				bind:value={field.nTumblers}
+			/>
 		</label>
-		<br />
 		<LockView {field} bind:lockViewEl />
 	</section>
 
@@ -68,7 +76,7 @@
 
 <style>
 	:root {
-		--pin-width: 1rem;
+		--pin-size: 1.4rem;
 		--clr-neg: red;
 		--clr-pos: blue;
 		--clr-hl: green;
@@ -76,6 +84,11 @@
 		--clr-bg-neg: hwb(from var(--clr-neg) h w b / 0.12);
 		--clr-bg-pos: hwb(from var(--clr-pos) h w b / 0.12);
 		--clr-bg-hl: hwb(from var(--clr-hl) h w b / 0.05);
+	}
+	@media (width < 350px) {
+		:root {
+			--pin-size: 1.2rem;
+		}
 	}
 	h2 {
 		margin-top: 0;
@@ -95,12 +108,12 @@
 		position: relative;
 		display: grid;
 		grid-template-areas: "lock deps solution";
-		@media (width < 80ch) {
+		@media (width < 90ch) {
 			grid-template-areas:
 				"lock solution"
 				"deps solution";
 		}
-		@media (width < 54ch) {
+		@media (width < 66ch) {
 			grid-template-areas:
 				"lock"
 				"deps"
@@ -124,6 +137,16 @@
 			}
 		}
 	}
+	.n-tumblers {
+		display: flex;
+		height: var(--pin-size);
+		align-items: center;
+		gap: 0.2em;
+	}
+	.n-tumblers__input {
+		max-height: var(--pin-size);
+	}
+
 	.dependencies {
 		grid-area: deps;
 	}

@@ -40,9 +40,9 @@
 		display: block;
 		width: max-content;
 		--field-width: attr(data-field-width type(<number>), 0);
-		width: calc(var(--pin-width) * var(--field-width));
+		width: calc(var(--pin-size) * var(--field-width));
 		margin: 0;
-		padding: 0 var(--pin-width);
+		padding: 0 var(--pin-size);
 		list-style: none;
 	}
 	.tumblers-list__item {
@@ -50,11 +50,14 @@
 		margin: 1px 0;
 		&::before {
 			counter-increment: tumblers;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			position: absolute;
 			content: counter(tumblers, upper-alpha);
 			inset: 0;
 			right: auto;
-			left: calc(var(--pin-width) * -1);
+			left: calc(var(--pin-size) * -1);
 		}
 	}
 	.tumblers-list__item.dep-neg {
