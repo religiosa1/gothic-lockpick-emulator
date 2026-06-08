@@ -5,24 +5,27 @@
 
 	interface Props {
 		field: Field;
-		excludedElements: HTMLElement[];
+		/** Focus should be either on the body, or on this specific elements */
+		includedElements: HTMLElement[];
 		onMoveRequested: (move: Move) => void;
 	}
-	let { field, excludedElements, onMoveRequested }: Props = $props();
+	let { field, includedElements, onMoveRequested }: Props = $props();
 </script>
 
 <svelte:document
 	onkeydown={(e) => {
 		// preventing tumblers moving on input to the header and such --
 		// not processing click events by early return
-		if (
-			document.activeElement !== document.body &&
-			!excludedElements.some(
-				(el) => document.activeElement === el || el.contains(document.activeElement)
-			)
-		) {
-			return;
+		if (document.activeElement !== document.body) {
+			const focusOnIncludedElements = includedElements.some((el) => {
+				const elHasFocus = document.activeElement === el || el.contains(document.activeElement);
+				return elHasFocus;
+			});
+			if (!focusOnIncludedElements) {
+				return;
+			}
 		}
+
 		switch (e.key) {
 			case "ArrowUp":
 			case "w":

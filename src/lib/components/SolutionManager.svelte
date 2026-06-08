@@ -137,12 +137,12 @@
 		}
 	}
 
-	let undoSteps = $state<HTMLUListElement>();
+	let solitionHistoryEl = $state<HTMLUListElement>();
 </script>
 
 <GlobalKeyHandler
 	{field}
-	excludedElements={[lockViewEl, undoSteps].filter((i) => i != null)}
+	includedElements={[lockViewEl].filter((i) => i != null)}
 	{onMoveRequested}
 />
 
@@ -182,7 +182,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <ul
-	bind:this={undoSteps}
+	bind:this={solitionHistoryEl}
 	class="solution-list"
 	tabindex="0"
 	onkeydown={(e) => {
@@ -234,7 +234,7 @@
 					restoreState(idx);
 					// restore state makes the current clicked button disabled, so this move focus to the body
 					// By manually focusing on the ul we can do proper keyboard nav through the table
-					undoSteps?.focus();
+					solitionHistoryEl?.focus();
 				}}
 				disabled={nonSolvingState || idx === currentHistoryIdx}
 			>
