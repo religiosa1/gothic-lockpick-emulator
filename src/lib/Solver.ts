@@ -1,5 +1,6 @@
 import { DirectionEnum, reverseDirection } from "./models/DirectionEnum";
 import { Move } from "./models/Move";
+import type { IMoveState } from "./models/IMoveState";
 import { SnapshotPacker, type PackedSnapshot } from "./models/SnapshotPacker";
 import type { TumblerIdx } from "./models/TumblerIdx";
 
@@ -8,13 +9,6 @@ interface SolverParams {
 	tumblerWidth: number;
 	dependencies: number[][];
 	tumblerRow: number;
-}
-
-/** Move command, with the resulting state of the command application for
- * undo-redo list */
-export interface MoveState {
-	move: Move;
-	state: PackedSnapshot;
 }
 
 export class Solver {
@@ -93,7 +87,7 @@ export class Solver {
 	}
 
 	/** get optimal (fewest-move) sequence to solve, or null if unsolvable. */
-	solve(snapshot: TumblerIdx[]): MoveState[] | undefined {
+	solve(snapshot: TumblerIdx[]): IMoveState[] | undefined {
 		if (!this.isBuilt) {
 			throw new Error("build method must be called first, to build a map of solutions");
 		}
@@ -103,12 +97,12 @@ export class Solver {
 		}
 
 		let s = snapshot.slice();
-		const movesStates: MoveState[] = [];
+		const movesStates: IMoveState[] = [];
 		while (this.distancesMap.get(k)! > 0) {
 			const m = this.nextStepsMap.get(k)!;
-			movesStates.push({ move: m, state: k });
 			s = this.apply(s, m)!;
 			k = this.packer.pack(s);
+			movesStates.push({ move: m, state: k });
 		}
 		return movesStates;
 	}

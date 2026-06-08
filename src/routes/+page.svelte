@@ -1,14 +1,15 @@
 <script lang="ts">
 	import DepTable from "$lib/components/DepTable.svelte";
-	import GlobalKeyHandler from "$lib/components/GlobalKeyHandler.svelte";
 	import ImportInput from "$lib/components/ImportInput.svelte";
 	import LockView from "$lib/components/LockView.svelte";
+	import SolutionManager from "$lib/components/SolutionManager.svelte";
+	import { GlobalEditorStateEnum } from "$lib/models/GlobalEditorStateEnum";
 	import { pickleView, saveLockView, tryRestoreLockView } from "$lib/persistency/lockView";
-	import { Solver } from "$lib/Solver";
 
 	const savedState = tryRestoreLockView();
 	let field = $state(savedState.field);
 	let lockName = $state(savedState.lockName);
+	let globalState = $state<GlobalEditorStateEnum>(GlobalEditorStateEnum.lockCreation);
 
 	function save() {
 		saveLockView({ field, lockName });
@@ -26,36 +27,8 @@
 		URL.revokeObjectURL(url);
 	}
 
-	let isSolving = $state(false);
-	async function solve() {
-		const startTs = performance.now();
-		const solver = new Solver({
-			nTumblers: field.nTumblers,
-			tumblerWidth: field.tumblerWidth,
-			tumblerRow: field.tumblerRow,
-			dependencies: field.dependencies,
-		});
-		isSolving = true;
-		try {
-			await solver.build();
-			const builtTs = performance.now();
-			const moveStates = solver.solve(field.snapshot());
-			const endTs = performance.now();
-			console.log(moveStates?.map((m) => m.move.toString()).join("\n") ?? "unsolvable");
-			console.log(
-				`Solved in ${endTs - startTs}, ` +
-					`solution graph built in ${builtTs - startTs}, ` +
-					`containing ${solver.size} possible steps`
-			);
-		} finally {
-			isSolving = false;
-		}
-	}
-
 	let lockViewEl = $state<HTMLUListElement>();
 </script>
-
-<GlobalKeyHandler {field} {lockViewEl} />
 
 <h1>Gothic Lockpicking Emulator</h1>
 
@@ -73,16 +46,15 @@
 
 <section class="dependencies">
 	<h3>Dependecies table</h3>
-	<DepTable {field} />
+	<DepTable {field} {globalState} />
 </section>
 
-<button onclick={() => field.reset()} type="button">Reset</button>
+<section class="undo-list">
+	<h3>Solution steps</h3>
+	<SolutionManager {field} {lockViewEl} bind:globalState />
+</section>
+
 <button onclick={save} type="button">Save Lock</button>
-{#if isSolving}
-	<button disabled type="button">Thinking...</button>
-{:else}
-	<button onclick={solve} type="button">Auto-Solve (WIP to console.log)</button>
-{/if}
 <details>
 	<summary>Import/Export</summary>
 	<button onclick={exportView} type="button">Export Lock to a file</button>

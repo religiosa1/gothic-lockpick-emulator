@@ -1,26 +1,14 @@
 <script lang="ts">
 	import { DirectionEnum } from "$lib/models/DirectionEnum";
-	import { FAILED_TUMBLER_MOVE_EVENT_NAME } from "$lib/models/FailedMoveEvent";
 	import type { Field } from "$lib/models/Field.svelte";
 	import { Move } from "$lib/models/Move";
 
 	interface Props {
 		field: Field;
-		lockViewEl: HTMLUListElement | undefined;
+		excludedElements: HTMLElement[];
+		onMoveRequested: (move: Move) => void;
 	}
-	let { field, lockViewEl }: Props = $props();
-
-	function dispatchFailedUpdatesEvent(failedIndexes: number[]): void {
-		if (!failedIndexes?.length) {
-			return;
-		}
-		const event = new CustomEvent(FAILED_TUMBLER_MOVE_EVENT_NAME, {
-			detail: {
-				indexes: failedIndexes,
-			},
-		});
-		document.dispatchEvent(event);
-	}
+	let { field, excludedElements, onMoveRequested }: Props = $props();
 </script>
 
 <svelte:document
@@ -29,8 +17,9 @@
 		// not processing click events by early return
 		if (
 			document.activeElement !== document.body &&
-			document.activeElement !== lockViewEl &&
-			!lockViewEl?.contains(document.activeElement)
+			!excludedElements.some(
+				(el) => document.activeElement === el || el.contains(document.activeElement)
+			)
 		) {
 			return;
 		}
@@ -50,15 +39,13 @@
 			case "ArrowLeft":
 			case "a":
 			case "h": {
-				const failed = field.moveTumbler(new Move(field.selectedTumblerIdx, DirectionEnum.Left));
-				dispatchFailedUpdatesEvent(failed);
+				onMoveRequested(new Move(field.selectedTumblerIdx, DirectionEnum.Left));
 				break;
 			}
 			case "ArrowRight":
 			case "d":
 			case "l": {
-				const failed = field.moveTumbler(new Move(field.selectedTumblerIdx, DirectionEnum.Right));
-				dispatchFailedUpdatesEvent(failed);
+				onMoveRequested(new Move(field.selectedTumblerIdx, DirectionEnum.Right));
 				break;
 			}
 		}

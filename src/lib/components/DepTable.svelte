@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { Field } from "$lib/models/Field.svelte";
+	import { GlobalEditorStateEnum } from "$lib/models/GlobalEditorStateEnum";
 	import { idxToChar } from "$lib/models/TumblerIdx";
 
 	interface Props {
 		field: Field;
+		globalState: GlobalEditorStateEnum;
 	}
-	let { field }: Props = $props();
+	let { field, globalState }: Props = $props();
 
 	let table: HTMLTableElement;
 	let tbody: HTMLTableSectionElement;
@@ -114,6 +116,10 @@
 							<button
 								class="dep-cell__btn"
 								type="button"
+								disabled={globalState !== GlobalEditorStateEnum.lockCreation}
+								title={globalState !== GlobalEditorStateEnum.lockCreation
+									? "Switch to lock editing mode to modify"
+									: undefined}
 								onclick={(e) => {
 									// TODO: also move field selected item and horizontalSelectionIndex
 									// here
@@ -146,10 +152,19 @@
 	</tbody>
 </table>
 <div>
-	<small> click to toggle,<br /> ctrl+click backwards</small>
+	<small>
+		click to toggle,<br /> ctrl+click backwards
+	</small>
 </div>
 
-<button type="button" onclick={() => field.clearDependencies()}>Clear Dependecies</button>
+<button
+	type="button"
+	disabled={globalState !== GlobalEditorStateEnum.lockCreation}
+	title={globalState !== GlobalEditorStateEnum.lockCreation
+		? "Switch to lock editing mode to modify"
+		: undefined}
+	onclick={() => field.clearDependencies()}>Clear Dependecies</button
+>
 
 <style>
 	.deptable {
@@ -173,6 +188,9 @@
 		min-width: 2.5ch;
 		aspect-ratio: 1;
 		color: currentColor;
+	}
+	.dep-cell__btn:disabled {
+		cursor: not-allowed;
 	}
 	.selected-row {
 		td,

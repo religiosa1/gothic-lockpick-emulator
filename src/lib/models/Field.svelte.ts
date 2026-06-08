@@ -56,6 +56,21 @@ export class Field {
 		this.dependencies.forEach((dep) => dep.fill(0));
 	}
 
+	setState(state: TumblerIdx[]): void {
+		if (state.length !== this.#nTumblers) {
+			throw new Error("Unexpected amount of tumblers in the input state");
+		}
+		for (let i = 0; i < state.length; i++) {
+			const t = state[i];
+			if (!Number.isInteger(t) || t < 0 || t >= this.tumblerWidth) {
+				throw new Error(`Invalid state value at idx ${i}: ${t}`);
+			}
+		}
+		for (let i = 0; i < state.length; i++) {
+			this.tumblers[i].currentPosition = state[i];
+		}
+	}
+
 	moveTumbler(move: Move): TumblerIdx[] {
 		const deps = this.dependencies[move.idx];
 		const newPositions = this.tumblers.map((t, i) => {
@@ -100,5 +115,11 @@ export class Field {
 	/** Capture current tumblers state as just an array of their positions */
 	snapshot(): TumblerIdx[] {
 		return this.tumblers.map((t) => t.currentPosition);
+	}
+
+	saveSnapshotAsInitialState() {
+		for (const tumbler of this.tumblers) {
+			tumbler.startingPosition = tumbler.currentPosition;
+		}
 	}
 }
