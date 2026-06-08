@@ -8,7 +8,7 @@ export type PackedSnapshot = number & {
 };
 declare const PackedSnapshotBrand: unique symbol;
 
-interface SnapshotPackerParams {
+export interface SnapshotPackerParams {
 	nTumblers: number;
 	tumblerWidth: number;
 }
