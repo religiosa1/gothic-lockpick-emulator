@@ -3,16 +3,22 @@
 	import ImportInput from "$lib/components/ImportInput.svelte";
 	import LockView from "$lib/components/LockView.svelte";
 	import SolutionManager from "$lib/components/SolutionManager.svelte";
+	import { Field } from "$lib/models/Field.svelte";
 	import { GlobalEditorStateEnum } from "$lib/models/GlobalEditorStateEnum";
-	import { pickleView, saveLockView, tryRestoreLockView } from "$lib/persistency/lockView";
+	import * as persistency from "$lib/persistency/lockView";
+	import { pickleView } from "$lib/persistency/PickledLockView";
 
-	const savedState = tryRestoreLockView();
+	const savedState = persistency.tryRestoreLockView();
 	let field = $state(savedState.field);
 	let lockName = $state(savedState.lockName);
 	let globalState = $state<GlobalEditorStateEnum>(GlobalEditorStateEnum.lockCreation);
 
 	function save() {
-		saveLockView({ field, lockName });
+		persistency.saveLockView({ field, lockName });
+	}
+	function newLock() {
+		field = new Field();
+		lockName = "Unnamed lock";
 	}
 
 	function exportView() {
@@ -32,6 +38,13 @@
 
 <h2 contenteditable bind:textContent={lockName}></h2>
 <button onclick={save} type="button">Save Lock</button>
+<button
+	type="button"
+	onclick={() => {
+		({ field, lockName } = persistency.deleteLockView());
+	}}>Delete lock</button
+>
+<button onclick={newLock} type="button">New Lock</button>
 
 <article>
 	<section class="lock-view">

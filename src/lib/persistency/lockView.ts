@@ -1,25 +1,11 @@
-import { Field } from "$lib/models/Field.svelte";
-import * as pickledField from "./PickledField";
+import {
+	pickleView,
+	unpickleView,
+	type PickledLockView,
+	type UnpickledLockView,
+} from "./PickledLockView";
 
 const LS_KEY = "current_lock_state";
-
-interface PickledLockView {
-	field: pickledField.PickledField;
-	lockName: string;
-}
-
-export interface UnpickledLockView {
-	field: Field;
-	lockName: string;
-}
-
-export function pickleView(state: UnpickledLockView): PickledLockView {
-	const pickledState: PickledLockView = {
-		lockName: state.lockName,
-		field: pickledField.pickle(state.field),
-	};
-	return pickledState;
-}
 
 export function saveLockView(state: UnpickledLockView): void {
 	const pickledState = pickleView(state);
@@ -27,19 +13,15 @@ export function saveLockView(state: UnpickledLockView): void {
 	console.log("Saved current state");
 }
 
+export function deleteLockView(): UnpickledLockView {
+	localStorage.removeItem(LS_KEY);
+	console.log("Deleted current state");
+	return makeDefaultState();
+}
+
 export function restoreFromJson(jsonValue: string): UnpickledLockView {
 	const parsed = JSON.parse(jsonValue) as PickledLockView;
-	if (typeof parsed !== "object") {
-		throw new Error(
-			"expecting a json string containing an object with representation " +
-				`of lock view, got ${typeof parsed} instead`
-		);
-	}
-	const field = pickledField.unpickle(parsed.field);
-	if (typeof parsed.lockName !== "string") {
-		parsed.lockName = "Unnamed Lock";
-	}
-	return { field, lockName: parsed.lockName };
+	return unpickleView(parsed);
 }
 
 export function tryRestoreLockView(): UnpickledLockView {
@@ -57,9 +39,30 @@ export function tryRestoreLockView(): UnpickledLockView {
 	return makeDefaultState();
 }
 
+// for the default lock, to make it slightly more apparent for a first time-user,
+// let's just have an existing lock from a game, Scatty's chest makes sense, as
+// it's the first quest-related one.
+const defaultLockView: PickledLockView = {
+	lockName: "Scatty's chest",
+	field: {
+		_type: "Field",
+		tumblerWidth: 7,
+		tumblerRow: 3,
+		tumblerPositions: [6, 0, 1, 2, 5],
+		dependencies: {
+			"0": [],
+			"1": [
+				[0, -1],
+				[2, -1],
+				[3, 1],
+			],
+			"2": [[0, -1]],
+			"3": [[0, 1]],
+			"4": [[1, 1]],
+		},
+	},
+};
+
 function makeDefaultState(): UnpickledLockView {
-	return {
-		field: new Field(),
-		lockName: "Unnamed Lock",
-	};
+	return unpickleView(defaultLockView);
 }
