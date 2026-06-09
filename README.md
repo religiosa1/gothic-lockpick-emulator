@@ -9,7 +9,7 @@ web-app to do it.
 It provides you an interface to map out and display dependencies between the
 tumblers in the lock, as well as auto-solve it with some BFS graph-traversal.
 
-In the later case, you just need to follow the steps/move it gives you verbatim.
+In the latter case, you just need to follow the steps/move it gives you verbatim.
 
 Work in progress and looks like ass, but it's operational and verified on a
 half-a-dozen of locks in the game.
@@ -22,7 +22,7 @@ a somewhat finicky process, which requires attention and time spent.
 1. Open [the app](https://religiosa1.github.io/gothic-lockpick-emulator/);
 2. Start lockpicking in the game;
 3. Set the amount of tumblers in the corresponding input in the app;
-4. Move tumblers left and right in the app, until their offset matches to the
+4. Move tumblers left and right in the app, until their offset matches the
    one in the game; [more](#how-to-replicate-a-lock-from-the-game)
 5. In the game, move each tumbler, to see which tumbler moves along with it,
    and mark them in "Dependencies" table in the app. [more](#mapping-out-tumbler-dependencies)
@@ -37,8 +37,8 @@ positioned with some offset from the center line. Your goal is to put the
 central 4-th pin (between 3 pins to the left and 3 pins to the right) in the
 middle.
 
-The complexity comes from the interconnected dependencies between the
-tumblers moving a tumbler, can move some other pins either in the same or
+The complexity comes from the interconnected dependencies between the tumblers.
+Moving a tumbler can move some other connected tumblers either in the same or
 the opposite direction.
 
 Each lock has a predetermined outline of pin offsets and their dependencies,
@@ -54,7 +54,7 @@ The first step is to create a representation of a lock.
 
 This app assigns an uppercase latin character to a tumbler, the farthest away
 from a lockpick (or in the top-right corner of your screen in game) is `A`, the
-next one is `B`, the closest one to you is usually `E` of `F` depending on the
+next one is `B`, the closest one to you is usually `E` or `F` depending on the
 lock complexity.
 
 You can create the schematic either in the app directly, I usually prefer ye
@@ -70,9 +70,9 @@ olde pen-and-paper first, before moving it to the app, if I'm stuck.
 
 Either way while drawing the outline, you should start with tumbler positions.
 Just count the amount of pins left or right from the center line and replicate
-it the offset in the app, so it matches to what you see in the game.
+the offset in the app, so it matches what you see in the game.
 
-| This in game:                                                                                                                        | Mathes this in the app:                                                                                                            |
+| This in game:                                                                                                                        | Matches this in the app:                                                                                                           |
 | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
 | <img width="400" height="290" alt="in-game" src="https://github.com/user-attachments/assets/530fa2e0-5dcb-462f-8411-e925336ac775" /> | <img width="398" height="334" alt="image" src="https://github.com/user-attachments/assets/aeee6c7f-c95e-4ddb-a2cf-e3d247d5c677" /> |
 
@@ -80,10 +80,10 @@ it the offset in the app, so it matches to what you see in the game.
 
 After that, you need to map out dependencies between tumblers. For that, you
 need to move each pin in the lock in the game, and see what other tumblers, if
-any moves with it.
+any, moves with it.
 
 In the dependency table, each currently selected tumbler is displayed as a row,
-and tumbler it affects while moving are represented in the columns. Click on
+and tumblers it affects while moving are represented in the columns. Click on
 the column cell, blue `+` denotes a tumbler that moves into the same direction,
 "a positive", red `-` denotes a tumbler that moves in the opposite direction,
 "a negative".
@@ -107,14 +107,14 @@ import them, to see how a finished lock looks like.
 
 While you're solving the lock in the app, it stores a list of moves you take.
 It's also your undo-redo functionality and is smart enough to not count
-repeated back-and-forth movements as a separate actions, if you're just playing
+repeated back-and-forth movements as separate actions, if you're just playing
 around. You can click on any movement in the solution list, to go back in time,
 if you messed up, or see how the lock looked like back then.
 
 If you click "auto-solve", it will automatically populate the list from any
 given point to the completion in the fewest-movement path.
 
-Regardless on how you achieved the final state, you can then use this list
+Regardless of how you achieved the final state, you can then use this list
 to replicate it in the game. I suggest you select the movement in the app,
 replicate it in the game, and then advance the selected movement (with either
 your mouse or keyboard). In this way you would be able to see the visual
