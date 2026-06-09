@@ -23,9 +23,42 @@
 			return tbody?.querySelector(selector) as HTMLButtonElement | null;
 		};
 		let button = getEl(x, y);
-		// TODO: search again here, for cases when we hit a diag
 		button?.focus();
 	});
+
+	function moveHorIdxLeft() {
+		let newValue = horizontalSelectionIndex;
+		for (let i = 0; i < 2; i++) {
+			newValue--;
+			// skipping self
+			if (newValue === field.selectedTumblerIdx) {
+				newValue--;
+			}
+			if (newValue >= 0) {
+				break;
+			}
+			newValue = field.nTumblers;
+			field.selectPrevTumbler();
+		}
+
+		horizontalSelectionIndex = newValue!;
+	}
+
+	function moveHorIdxRight() {
+		let newValue = horizontalSelectionIndex;
+		for (let i = 0; i < 2; i++) {
+			newValue++;
+			if (newValue === field.selectedTumblerIdx) {
+				newValue++;
+			}
+			if (newValue < field.nTumblers) {
+				break;
+			}
+			newValue = -1;
+			field.selectNextTumbler();
+		}
+		horizontalSelectionIndex = newValue;
+	}
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -40,46 +73,30 @@
 			case "w":
 			case "k": {
 				field.selectPrevTumbler();
+				if (horizontalSelectionIndex === field.selectedTumblerIdx) {
+					field.selectPrevTumbler();
+				}
 				break;
 			}
 			case "ArrowDown":
 			case "s":
 			case "j": {
 				field.selectNextTumbler();
+				if (horizontalSelectionIndex === field.selectedTumblerIdx) {
+					field.selectNextTumbler();
+				}
 				break;
 			}
 			case "ArrowLeft":
 			case "a":
 			case "h": {
-				// TODO: it seems more intuitive to actually chaange the selection
-				// of the row, as you can traverse and fill out the whole table with
-				// one keu and a spacebar.
-				let newValue = horizontalSelectionIndex - 1;
-				// skipping self
-				if (newValue === field.selectedTumblerIdx) {
-					newValue--;
-				}
-				if (newValue < 0) {
-					newValue =
-						field.selectedTumblerIdx === field.nTumblers - 1
-							? field.nTumblers - 2
-							: field.nTumblers - 1;
-				}
-				horizontalSelectionIndex = newValue;
+				moveHorIdxLeft();
 				break;
 			}
 			case "ArrowRight":
 			case "d":
 			case "l": {
-				let newValue = horizontalSelectionIndex + 1;
-				// skipping self
-				if (newValue === field.selectedTumblerIdx) {
-					newValue++;
-				}
-				if (newValue >= field.nTumblers) {
-					newValue = field.selectedTumblerIdx === 0 ? 1 : 0;
-				}
-				horizontalSelectionIndex = newValue;
+				moveHorIdxRight();
 				break;
 			}
 		}
@@ -121,8 +138,8 @@
 									? "Switch to lock editing mode to modify"
 									: undefined}
 								onclick={(e) => {
-									// TODO: also move field selected item and horizontalSelectionIndex
-									// here
+									field.selectedTumblerIdx = idx;
+									horizontalSelectionIndex = depIdx;
 									const newValue = (() => {
 										switch (expression) {
 											case 1:
@@ -192,6 +209,9 @@
 		border: none;
 		color: currentColor;
 		font-size: 1.2rem;
+		&:focus {
+			outline: 2px solid var(--clr-hl);
+		}
 	}
 	.dep-cell__btn:disabled {
 		cursor: not-allowed;

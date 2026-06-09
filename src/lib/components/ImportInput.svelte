@@ -50,7 +50,4 @@
 		inset: 0;
 		visibility: hidden;
 	}
-	.error {
-		color: var(--clr-danger, red);
-	}
 </style>

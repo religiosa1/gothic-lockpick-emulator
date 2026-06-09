@@ -109,14 +109,7 @@
 	}
 
 	let solitionHistoryEl = $state<HTMLUListElement>();
-	let notSolvable = $state(false);
-	$effect(() => {
-		// just tracking in the event -- so it triggers on those values changed
-		moveStates.length || currentHistoryIdx;
-		if (notSolvable) {
-			notSolvable = false;
-		}
-	});
+	let autosolverError = $state<string>();
 
 	async function solve() {
 		const startTs = performance.now();
@@ -127,7 +120,7 @@
 			dependencies: field.dependencies,
 		});
 		globalState = GlobalEditorStateEnum.autoSolving;
-		notSolvable = false;
+		autosolverError = undefined;
 		try {
 			await solver.build();
 			const builtTs = performance.now();
@@ -152,8 +145,12 @@
 				// through it
 				solitionHistoryEl?.focus();
 			} else {
-				notSolvable = true;
+				autosolverError = "The lock isn't solvable, the math says so";
 			}
+		} catch (err) {
+			console.error(err);
+			const message = err instanceof Error ? err.message : String(err);
+			autosolverError = `Error while solving the lock: ${message}`;
 		} finally {
 			globalState = GlobalEditorStateEnum.solving;
 		}
@@ -189,6 +186,7 @@
 					return;
 				}
 				reset(true);
+				autosolverError = undefined;
 			} else {
 				field.saveSnapshotAsInitialState();
 			}
@@ -277,6 +275,9 @@
 
 {#if globalState !== GlobalEditorStateEnum.autoSolving}
 	<button onclick={solve} type="button">Auto-Solve</button>
+	{#if autosolverError}
+		<p class="error">{autosolverError}</p>
+	{/if}
 {:else}
 	<button disabled type="button">Thinking on solution...</button>
 {/if}
