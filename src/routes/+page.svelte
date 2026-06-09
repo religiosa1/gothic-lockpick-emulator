@@ -66,7 +66,7 @@
 	</section>
 
 	<section class="dependencies">
-		<h3>Dependecies table</h3>
+		<h3>Dependencies table</h3>
 		<DepTable {field} {globalState} />
 	</section>
 

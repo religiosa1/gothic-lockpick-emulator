@@ -180,7 +180,7 @@
 	title={globalState !== GlobalEditorStateEnum.lockCreation
 		? "Switch to lock editing mode to modify"
 		: undefined}
-	onclick={() => field.clearDependencies()}>Clear Dependecies</button
+	onclick={() => field.clearDependencies()}>Clear Dependencies</button
 >
 
 <style>

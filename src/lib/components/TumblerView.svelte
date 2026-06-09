@@ -9,8 +9,6 @@
 	}
 	let { tumbler, width, targetRow, idx }: Props = $props();
 	let offset = $derived(width - tumbler.currentPosition - 1);
-
-	$effect(() => {});
 </script>
 
 <ul

@@ -75,7 +75,7 @@
 			return;
 		}
 		// undo check -- verifying that the move isn't a cancellation of a previous one
-		const existingState = moveStates.at(currentHistoryIdx);
+		const existingState = currentHistoryIdx >= 0 ? moveStates.at(currentHistoryIdx) : undefined;
 		if (existingState && move.isOpposite(existingState.move)) {
 			historyOffset++;
 			return;
