@@ -1,5 +1,6 @@
 <script lang="ts">
 	import favicon from "$lib/assets/favicon.svg";
+	import "$lib/assets/globalStyles.css";
 
 	let { children } = $props();
 </script>
@@ -19,40 +20,6 @@
 </footer>
 
 <style>
-	:global {
-		:root {
-			--clr-brd: lightgray;
-			--clr-bg: white;
-			--body-pad: 0.5rem;
-		}
-		html {
-			margin: 0;
-			padding: 0;
-			min-height: 100dvh;
-		}
-		body {
-			max-width: 1200px;
-			margin: 0 auto;
-			display: grid;
-			grid-template-areas:
-				"header"
-				"main"
-				"footer";
-			font-family:
-				Roboto,
-				"Segoe UI",
-				-apple-system,
-				Helvetica,
-				Arial,
-				sans-serif;
-			font-size: 16px;
-			grid-template-rows: auto 1fr auto;
-			min-height: 100vh;
-			min-height: 100dvh;
-			padding: 0;
-		}
-	}
-
 	h1 {
 		margin: 1rem 0;
 	}

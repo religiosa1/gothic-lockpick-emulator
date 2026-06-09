@@ -33,6 +33,10 @@ export class Field {
 			}
 		} else if (old > v) {
 			this.tumblers.length = v;
+			this.dependencies.length = v;
+			for (const dep of this.dependencies) {
+				dep.length = v;
+			}
 		}
 	}
 

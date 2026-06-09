@@ -1,0 +1,85 @@
+:root {
+	--clr-brd: lightgray;
+	--clr-brd-dark: rgb(84, 84, 84);
+	--clr-bg: white;
+	--clr-surface: white;
+	--body-pad: 0.5rem;
+
+	--btn-bg: #efefef;
+	--btn-bg-hover: #e3e3e3;
+	--btn-bg-active: #d5d5d5;
+	--btn-bg-disabled: #f5f5f5;
+	--btn-clr: #000;
+	--btn-clr-disabled: #aaa;
+	--btn-brd: #767676;
+	--btn-radius: 3px;
+	--btn-pad: 3px 10px;
+}
+
+button,
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4em;
+	padding: var(--btn-pad);
+	background: var(--btn-bg);
+	color: var(--btn-clr);
+	border: 1px solid var(--btn-brd);
+	border-radius: var(--btn-radius);
+	box-shadow: none;
+	font: inherit;
+	line-height: normal;
+	cursor: pointer;
+	user-select: none;
+	text-decoration: none;
+	transition: background 0.05s;
+}
+button:hover,
+button.hover,
+.btn:hover,
+.btn.hover {
+	background: var(--btn-bg-hover);
+}
+button:active,
+button.active,
+.btn:active,
+.btn.active {
+	background: var(--btn-bg-active);
+	transform: translateY(1px);
+}
+button:disabled,
+button.disabled,
+.btn:disabled,
+.btn.disabled {
+	background: var(--btn-bg-disabled);
+	color: var(--btn-clr-disabled);
+	cursor: not-allowed;
+	pointer-events: none;
+}
+html {
+	margin: 0;
+	padding: 0;
+	min-height: 100dvh;
+}
+body {
+	max-width: 1200px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-areas:
+		"header"
+		"main"
+		"footer";
+	font-family:
+		Roboto,
+		"Segoe UI",
+		-apple-system,
+		Helvetica,
+		Arial,
+		sans-serif;
+	font-size: 16px;
+	grid-template-rows: auto 1fr auto;
+	min-height: 100vh;
+	min-height: 100dvh;
+	padding: 0;
+}

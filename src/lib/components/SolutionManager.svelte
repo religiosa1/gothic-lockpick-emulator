@@ -108,6 +108,16 @@
 		}
 	}
 
+	let solitionHistoryEl = $state<HTMLUListElement>();
+	let notSolvable = $state(false);
+	$effect(() => {
+		// just tracking in the event -- so it triggers on those values changed
+		moveStates.length || currentHistoryIdx;
+		if (notSolvable) {
+			notSolvable = false;
+		}
+	});
+
 	async function solve() {
 		const startTs = performance.now();
 		const solver = new Solver({
@@ -117,6 +127,7 @@
 			dependencies: field.dependencies,
 		});
 		globalState = GlobalEditorStateEnum.autoSolving;
+		notSolvable = false;
 		try {
 			await solver.build();
 			const builtTs = performance.now();
@@ -136,13 +147,16 @@
 				for (const state of solutionSteps) {
 					moveStates.push(state);
 				}
+				// moving the focus to the solution manager, so you can immediately go
+				// through it
+				solitionHistoryEl?.focus();
+			} else {
+				notSolvable = true;
 			}
 		} finally {
 			globalState = GlobalEditorStateEnum.solving;
 		}
 	}
-
-	let solitionHistoryEl = $state<HTMLUListElement>();
 </script>
 
 <GlobalKeyHandler

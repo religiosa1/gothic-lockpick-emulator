@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { restoreFromJson, type UnpickledLockView } from "$lib/persistency/lockView";
+	import { restoreFromJson } from "$lib/persistency/lockView";
+	import type { UnpickledLockView } from "$lib/persistency/PickledLockView";
 
 	interface Props {
 		onFileUploaded: (v: UnpickledLockView) => void;
@@ -45,6 +46,7 @@
 		cursor: pointer;
 	}
 	input {
+		position: absolute;
 		inset: 0;
 		visibility: hidden;
 	}

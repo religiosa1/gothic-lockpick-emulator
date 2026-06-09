@@ -23,12 +23,12 @@
 		border-radius: 50% / 0.8em;
 		padding: 1px;
 		box-sizing: content-box;
-		background-color: light-dark(rgba(239, 239, 239, 0.3), rgba(59, 59, 59, 0.3));
+		background-color: rgba(239, 239, 239, 0.3);
 		transition: 0.15s ease-in-out;
 		transition-property: background-color;
 	}
 	.toggler:not(:disabled):hover {
-		background-color: #e5e5e5;
+		background-color: var(--btn-bg-hover);
 	}
 	input:checked ~ .toggler {
 		background-color: var(--clr-hl);
@@ -45,8 +45,8 @@
 		--ar: 1;
 		aspect-ratio: var(--ar);
 		border-radius: 0.8em;
-		border: 1.2px solid light-dark(rgb(84, 84, 84), rgb(170, 170, 170));
-		background-color: white;
+		border: 1.2px solid var(--clr-brd-dark);
+		background-color: var(--clr-surface);
 		transition: 0.15s ease-in-out;
 		transition-property: translate, aspect-ratio;
 	}
@@ -58,6 +58,6 @@
 	}
 	input:disabled ~ .toggler::after {
 		border-color: rgba(118, 118, 118, 0.3);
-		background-color: light-dark(rgba(239, 239, 239, 0.3), rgba(19, 1, 1, 0.3));
+		background-color: rgba(239, 239, 239, 0.3);
 	}
 </style>
