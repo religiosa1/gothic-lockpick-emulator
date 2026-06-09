@@ -136,6 +136,7 @@
 	.lock-view {
 		grid-area: lock;
 		position: sticky;
+		align-self: start;
 		z-index: 10;
 		top: 0;
 		background-color: var(--clr-bg);
@@ -162,6 +163,11 @@
 
 	.dependencies {
 		grid-area: deps;
+		@media (width >= 90ch) {
+			position: sticky;
+			align-self: start;
+			top: 0;
+		}
 	}
 	.solution {
 		grid-area: solution;

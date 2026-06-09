@@ -53,6 +53,10 @@
 		historyOffset = moveStates.length - idx - 1;
 		field.setState(snapshot);
 		field.selectedTumblerIdx = moveState.move.idx;
+		solutionHistoryEl?.querySelector(`.solution-list__item[data-idx="${idx}"]`)?.scrollIntoView({
+			behavior: "smooth",
+			block: "nearest",
+		});
 	}
 
 	const nonSolvingState = $derived(globalState !== GlobalEditorStateEnum.solving);
@@ -108,7 +112,7 @@
 		}
 	}
 
-	let solitionHistoryEl = $state<HTMLUListElement>();
+	let solutionHistoryEl = $state<HTMLUListElement>();
 	let autosolverError = $state<string>();
 
 	async function solve() {
@@ -143,7 +147,7 @@
 				historyOffset += solutionSteps.length;
 				// moving the focus to the solution manager, so you can immediately go
 				// through it
-				solitionHistoryEl?.focus();
+				solutionHistoryEl?.focus();
 			} else {
 				autosolverError = "The lock isn't solvable, the math says so";
 			}
@@ -203,7 +207,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <ul
-	bind:this={solitionHistoryEl}
+	bind:this={solutionHistoryEl}
 	class="solution-list"
 	tabindex="0"
 	onkeydown={(e) => {
@@ -250,6 +254,7 @@
 	{/if}
 	{#each moveStates as state, idx}
 		<li
+			data-idx={idx}
 			class="solution-list__item"
 			class:undone={idx > currentHistoryIdx}
 			class:current={idx === currentHistoryIdx}
@@ -263,7 +268,7 @@
 					restoreState(idx);
 					// restore state makes the current clicked button disabled, so this move focus to the body
 					// By manually focusing on the ul we can do proper keyboard nav through the table
-					solitionHistoryEl?.focus();
+					solutionHistoryEl?.focus();
 				}}
 				disabled={nonSolvingState || idx === currentHistoryIdx}
 			>
@@ -292,6 +297,8 @@
 	.solution-list__item {
 		margin: 0.2em 0;
 		padding: 0;
+		/* to have some breathing room during the autoscroll on keyboard nav */
+		scroll-margin-block: 4em;
 		&::before {
 			content: counter(steps) ". ";
 			display: inline-block;
