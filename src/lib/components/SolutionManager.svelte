@@ -147,6 +147,7 @@
 				for (const state of solutionSteps) {
 					moveStates.push(state);
 				}
+				historyOffset += solutionSteps.length;
 				// moving the focus to the solution manager, so you can immediately go
 				// through it
 				solitionHistoryEl?.focus();
@@ -242,7 +243,7 @@
 		}
 	}}
 >
-	{#if globalState === GlobalEditorStateEnum.solving}
+	{#if globalState !== GlobalEditorStateEnum.lockCreation}
 		<li class="solution-list__item initial" class:current={currentHistoryIdx === -1}>
 			<button class="history-state-btn" type="button" onclick={() => reset(false)}>
 				Initial state

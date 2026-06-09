@@ -183,6 +183,7 @@
 		position: relative;
 	}
 	.dep-cell__btn {
+		all: unset;
 		cursor: pointer;
 		display: block;
 		position: absolute;
