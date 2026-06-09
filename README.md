@@ -1,6 +1,6 @@
 # Gothic Remake lockpicking emulator and auto-solver
 
-While playing the new [Gothic Remake](https://gothic.thqnordic.com/) game and
+While playing the new Gothic Remake game and
 encountering the lockpicking mini-game puzzle, I understood that I'm not
 smart/patient enough to solve most of them. At the same time, I thought "huh,
 this actually should be algorithmically solvable". And I decided to build this
