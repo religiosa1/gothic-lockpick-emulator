@@ -42,7 +42,7 @@
 		--field-width: attr(data-field-width type(<number>), 0);
 		width: calc(var(--pin-size) * var(--field-width));
 		margin: 0;
-		padding: 0 var(--pin-size);
+		padding: 0 0 0 var(--pin-size);
 		list-style: none;
 	}
 	.tumblers-list__item {

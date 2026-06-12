@@ -22,7 +22,7 @@ export function pickle(field: Field): PickledField {
 		_type: "Field",
 		tumblerWidth: field.tumblerWidth,
 		tumblerRow: field.tumblerRow,
-		tumblerPositions: field.tumblers.map((t) => t.currentPosition),
+		tumblerPositions: field.tumblers.map((t) => t.startingPosition),
 		dependencies,
 	};
 }

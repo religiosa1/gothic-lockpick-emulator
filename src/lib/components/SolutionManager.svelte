@@ -70,6 +70,11 @@
 			dispatchFailedUpdatesEvent(failed);
 			return;
 		}
+		// in lock creation view every move is a move for initial state, so the lock
+		// can be properly pickled
+		if (globalState === GlobalEditorStateEnum.lockCreation) {
+			field.saveSnapshotAsInitialState();
+		}
 
 		if (nonSolvingState) {
 			return;
@@ -148,8 +153,10 @@
 				// moving the focus to the solution manager, so you can immediately go
 				// through it
 				solutionHistoryEl?.focus();
-			} else {
+			} else if (solutionSteps == null) {
 				autosolverError = "The lock isn't solvable, the math says so";
+			} else {
+				autosolverError = "It's already solved";
 			}
 		} catch (err) {
 			console.error(err);
