@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Tumbler } from "../models/Tumbler.svelte";
+	import { tumblerMouseDragAttachment } from "./tumblerMouseDragAttachment";
 
 	interface Props {
 		tumbler: Tumbler;
@@ -15,8 +16,10 @@
 	data-pos={tumbler.currentPosition}
 	data-offset={offset}
 	class="tumbler"
+	{@attach tumblerMouseDragAttachment(idx)}
 	{@attach (el) => {
 		const ac = new AbortController();
+
 		document.addEventListener(
 			"failed-tumbler-move",
 			(e) => {
@@ -56,6 +59,9 @@
 		padding: 0;
 		list-style: none;
 		background: lightblue;
+		touch-action: pan-y;
+		cursor: ew-resize;
+		user-select: none;
 		--offset: attr(data-offset type(<number>), 0);
 		margin-left: calc(var(--pin-size) * var(--offset));
 		transition: var(--transition-props);

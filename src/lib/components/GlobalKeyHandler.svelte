@@ -2,6 +2,7 @@
 	import { DirectionEnum } from "$lib/models/DirectionEnum";
 	import type { Field } from "$lib/models/Field.svelte";
 	import { Move } from "$lib/models/Move";
+	import { MOVE_REQUESTED_EVENT } from "$lib/models/MoveRequestedEvent";
 
 	interface Props {
 		field: Field;
@@ -10,6 +11,20 @@
 		onMoveRequested: (move: Move) => void;
 	}
 	let { field, includedElements, onMoveRequested }: Props = $props();
+
+	$effect(() => {
+		const ac = new AbortController();
+
+		document.addEventListener(
+			MOVE_REQUESTED_EVENT,
+			(e) => {
+				onMoveRequested(e.detail);
+			},
+			{ signal: ac.signal }
+		);
+
+		return () => ac.abort();
+	});
 </script>
 
 <svelte:document
