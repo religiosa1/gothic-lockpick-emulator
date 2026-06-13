@@ -1,4 +1,4 @@
-import { directionToString, type DirectionEnum } from "./DirectionEnum";
+import { directionToString, type DirectionEnum } from "./enums/DirectionEnum";
 import { idxToChar, type TumblerIdx } from "./TumblerIdx";
 
 export class Move {

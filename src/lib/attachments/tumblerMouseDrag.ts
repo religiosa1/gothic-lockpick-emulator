@@ -1,7 +1,7 @@
 import type { TumblerIdx } from "$lib/models/TumblerIdx";
+import { DirectionEnum } from "$lib/models/enums/DirectionEnum";
 import { Move } from "$lib/models/Move";
-import { MOVE_REQUESTED_EVENT } from "$lib/models/MoveRequestedEvent";
-import { DirectionEnum } from "$lib/models/DirectionEnum";
+import { MOVE_REQUESTED_EVENT } from "$lib/models/events/MoveRequestedEvent";
 
 export function tumblerMouseDrag(idx: TumblerIdx) {
 	function dispatchMove(direction: DirectionEnum) {

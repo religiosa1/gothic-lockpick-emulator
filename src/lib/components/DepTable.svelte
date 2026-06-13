@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { MediaQuery } from "svelte/reactivity";
+	import { EditorStateEnum } from "$lib/models/enums/EditorStateEnum";
 	import type { Field } from "$lib/models/Field.svelte";
-	import { EditorStateEnum } from "$lib/models/EditorStateEnum";
 	import { idxToChar } from "$lib/models/TumblerIdx";
 
 	interface Props {

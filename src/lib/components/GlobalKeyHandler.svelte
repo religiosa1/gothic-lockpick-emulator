@@ -1,77 +1,52 @@
 <script lang="ts">
-	import { DirectionEnum } from "$lib/models/DirectionEnum";
+	import { DirectionEnum } from "$lib/models/enums/DirectionEnum";
+	import type { Field } from "$lib/models/Field.svelte";
 	import { Move } from "$lib/models/Move";
-	import { MOVE_REQUESTED_EVENT } from "$lib/models/MoveRequestedEvent";
-	import type { TumblerIdx } from "$lib/models/TumblerIdx";
+	import { dispatchMoveRequestEvent } from "$lib/models/events/MoveRequestedEvent";
 
 	interface Props {
-		onPrevTumbler(): void;
-		onNextTumbler(): void;
-		currentlySelectedIdx: TumblerIdx;
+		field: Field;
 		/** Focus should be either on the body, or on this specific elements */
-		includedElements: HTMLElement[];
-		onMoveRequested: (move: Move) => void;
+		lockViewEl: HTMLElement | undefined;
 	}
-	let {
-		onNextTumbler,
-		onPrevTumbler,
-		currentlySelectedIdx,
-		includedElements,
-		onMoveRequested,
-	}: Props = $props();
-
-	$effect(() => {
-		const ac = new AbortController();
-
-		document.addEventListener(
-			MOVE_REQUESTED_EVENT,
-			(e) => {
-				onMoveRequested(e.detail);
-			},
-			{ signal: ac.signal }
-		);
-
-		return () => ac.abort();
-	});
+	let { field, lockViewEl }: Props = $props();
 </script>
 
 <svelte:document
 	onkeydown={(e) => {
-		// preventing tumblers moving on input to the header and such --
-		// not processing click events by early return
-		if (document.activeElement !== document.body) {
-			const focusOnIncludedElements = includedElements.some((el) => {
-				const elHasFocus = document.activeElement === el || el.contains(document.activeElement);
-				return elHasFocus;
-			});
-			if (!focusOnIncludedElements) {
+		{
+			// preventing tumblers moving on input to the header and such --
+			// not processing click events by early return
+			const actEl = document.activeElement;
+			const isSomeElementFocused = actEl !== document.body;
+			const isFocusWithinLockView = actEl === lockViewEl || lockViewEl?.contains(actEl);
+			if (isSomeElementFocused && !isFocusWithinLockView) {
 				return;
 			}
 		}
-
 		switch (e.key) {
 			case "ArrowUp":
 			case "w":
 			case "k": {
-				onPrevTumbler();
+				field.selectPrevTumbler();
 				break;
 			}
 			case "ArrowDown":
 			case "s":
 			case "j": {
-				onNextTumbler();
+				field.selectNextTumbler();
 				break;
 			}
 			case "ArrowLeft":
 			case "a":
 			case "h": {
-				onMoveRequested(new Move(currentlySelectedIdx, DirectionEnum.Left));
+				dispatchMoveRequestEvent(new Move(field.selectedTumblerIdx, DirectionEnum.Left));
 				break;
 			}
 			case "ArrowRight":
 			case "d":
 			case "l": {
-				onMoveRequested(new Move(currentlySelectedIdx, DirectionEnum.Right));
+				dispatchMoveRequestEvent(new Move(field.selectedTumblerIdx, DirectionEnum.Right));
 				break;
 			}
 		}

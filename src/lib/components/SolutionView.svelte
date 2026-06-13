@@ -1,16 +1,12 @@
 <script lang="ts">
-	import GlobalKeyHandler from "$lib/components/GlobalKeyHandler.svelte";
-	import type { Field } from "$lib/models/Field.svelte";
-	import { EditorStateEnum } from "$lib/models/EditorStateEnum";
+	import { EditorStateEnum } from "$lib/models/enums/EditorStateEnum";
 	import type { SolutionManager } from "$lib/models/SolutionManager.svelte";
 	import Toggle from "./Toggle.svelte";
 
 	interface Props {
-		field: Field;
 		solutionManager: SolutionManager;
-		lockViewEl: HTMLUListElement | undefined;
 	}
-	let { lockViewEl, solutionManager, field }: Props = $props();
+	let { solutionManager }: Props = $props();
 
 	let solutionHistoryEl = $state<HTMLUListElement>();
 	$effect(() => {
@@ -35,14 +31,6 @@
 		}
 	}
 </script>
-
-<GlobalKeyHandler
-	onPrevTumbler={() => field.selectPrevTumbler()}
-	onNextTumbler={() => field.selectNextTumbler()}
-	currentlySelectedIdx={field.selectedTumblerIdx}
-	includedElements={[lockViewEl].filter((i) => i != null)}
-	onMoveRequested={(m) => solutionManager.tryMove(m)}
-/>
 
 <label class="toggle-label">
 	Editing Lock

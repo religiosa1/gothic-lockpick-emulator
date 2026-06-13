@@ -1,19 +1,34 @@
 <script lang="ts">
+	import { Field } from "$lib/models/Field.svelte";
+	import { EditorStateEnum } from "$lib/models/enums/EditorStateEnum";
+	import { SolutionManager } from "$lib/models/SolutionManager.svelte";
+	import { MOVE_REQUESTED_EVENT } from "$lib/models/events/MoveRequestedEvent";
+	import * as persistency from "$lib/persistency/lockView";
+	import { pickleView } from "$lib/persistency/PickledLockView";
 	import DepTable from "$lib/components/DepTable.svelte";
 	import ImportInput from "$lib/components/ImportInput.svelte";
 	import LockView from "$lib/components/LockView.svelte";
 	import SolutionView from "$lib/components/SolutionView.svelte";
-	import { Field } from "$lib/models/Field.svelte";
-	import * as persistency from "$lib/persistency/lockView";
-	import { pickleView } from "$lib/persistency/PickledLockView";
-	import { SolutionManager } from "$lib/models/SolutionManager.svelte";
-	import { EditorStateEnum } from "$lib/models/EditorStateEnum";
+	import GlobalKeyHandler from "$lib/components/GlobalKeyHandler.svelte";
 
 	const savedState = persistency.tryRestoreLockView();
 	let field = $state(savedState.field);
 	let lockName = $state(savedState.lockName);
 
 	const solutionManager = new SolutionManager(() => field);
+	$effect(() => {
+		const ac = new AbortController();
+
+		document.addEventListener(
+			MOVE_REQUESTED_EVENT,
+			(e) => {
+				solutionManager.tryMove(e.detail);
+			},
+			{ signal: ac.signal }
+		);
+
+		return () => ac.abort();
+	});
 
 	function save() {
 		persistency.saveLockView({ field, lockName });
@@ -47,6 +62,8 @@
 	let lockViewEl = $state<HTMLUListElement>();
 </script>
 
+<GlobalKeyHandler {lockViewEl} {field} />
+
 <h2 contenteditable bind:textContent={lockName}></h2>
 <button onclick={save} type="button">Save Lock</button>
 <button onclick={newLock} type="button">New Lock</button>
@@ -77,7 +94,7 @@
 
 	<section class="solution">
 		<h3>Solution steps</h3>
-		<SolutionView {field} {lockViewEl} {solutionManager} />
+		<SolutionView {solutionManager} />
 	</section>
 </article>
 

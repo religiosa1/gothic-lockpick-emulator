@@ -1,4 +1,4 @@
-import { DirectionEnum, reverseDirection } from "./models/DirectionEnum";
+import { DirectionEnum, reverseDirection } from "./models/enums/DirectionEnum";
 import { Move } from "./models/Move";
 import type { IMoveState } from "./models/IMoveState";
 import { SnapshotPacker, type PackedSnapshot } from "./models/SnapshotPacker";

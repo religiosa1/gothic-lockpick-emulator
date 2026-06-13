@@ -1,4 +1,5 @@
-import type { TumblerIdx } from "./TumblerIdx";
+import type { TumblerIdx } from "$lib/models/TumblerIdx";
+
 export const FAILED_TUMBLER_MOVE_EVENT_NAME = "failed-tumbler-move";
 
 export interface FailedTumblerMoveEventDetail {

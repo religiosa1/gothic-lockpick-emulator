@@ -1,7 +1,7 @@
 import { Solver } from "$lib/Solver";
-import { dispatchFailedMoveEvent } from "./FailedMoveEvent";
+import { dispatchFailedMoveEvent } from "./events/FailedMoveEvent";
 import type { Field } from "./Field.svelte";
-import { EditorStateEnum } from "./EditorStateEnum";
+import { EditorStateEnum } from "./enums/EditorStateEnum";
 import type { IMoveState } from "./IMoveState";
 import type { Move } from "./Move";
 import { SnapshotPacker } from "./SnapshotPacker";
@@ -10,7 +10,7 @@ export class SolutionManager {
 	movesHistory = $state<IMoveState[]>([]);
 
 	/** Offset in move state from history -- during normal operations must be on 0,
-	 * after undo it decrementes by one, redos increment it back */
+	 * after undo it decrements by one, redo increments it back */
 	historyOffset = $state(0);
 
 	currentHistoryIdx = $derived.by(() => {
