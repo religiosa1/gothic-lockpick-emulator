@@ -14,7 +14,7 @@
 
 <ul
 	data-pos={tumbler.currentPosition}
-	data-offset={offset}
+	style:--offset={offset}
 	class="tumbler"
 	{@attach tumblerMouseDragAttachment(idx)}
 	{@attach (el) => {
@@ -62,7 +62,6 @@
 		touch-action: pan-y;
 		cursor: ew-resize;
 		user-select: none;
-		--offset: attr(data-offset type(<number>), 0);
 		margin-left: calc(var(--pin-size) * var(--offset));
 		transition: var(--transition-props);
 		transition-property: margin-left;

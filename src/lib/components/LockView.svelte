@@ -16,7 +16,7 @@
 	bind:this={lockViewEl}
 	tabindex="0"
 	class="tumblers-list"
-	data-field-width={(field.tumblerWidth - 1) * 2 + 1}
+	style:--field-width={(field.tumblerWidth - 1) * 2 + 1}
 >
 	{#each field.tumblers as tumbler, idx}
 		{@const depExpression = field.dependencies[field.selectedTumblerIdx][idx]}
@@ -39,7 +39,6 @@
 		counter-reset: tumblers;
 		display: block;
 		width: max-content;
-		--field-width: attr(data-field-width type(<number>), 0);
 		width: calc(var(--pin-size) * var(--field-width));
 		margin: 0;
 		padding: 0 0 0 var(--pin-size);

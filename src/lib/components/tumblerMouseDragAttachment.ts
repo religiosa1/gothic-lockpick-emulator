@@ -13,19 +13,6 @@ export function tumblerMouseDragAttachment(idx: TumblerIdx) {
 	return (el: HTMLElement) => {
 		const ac = new AbortController();
 
-		let hasDragged = false;
-		el.addEventListener(
-			"click",
-			() => {
-				if (hasDragged) {
-					hasDragged = false;
-					return;
-				}
-				dispatchMove(DirectionEnum.Right);
-			},
-			{ signal: ac.signal }
-		);
-
 		let startX = 0;
 		let startY = 0;
 		let lastStepX = 0;
@@ -40,7 +27,6 @@ export function tumblerMouseDragAttachment(idx: TumblerIdx) {
 				startY = e.clientY;
 				lastStepX = e.clientX;
 				isDragging = true;
-				hasDragged = false;
 				pinSize = el.querySelector(".pin")?.getBoundingClientRect().width ?? 22;
 				el.setPointerCapture(e.pointerId);
 			},
@@ -64,7 +50,6 @@ export function tumblerMouseDragAttachment(idx: TumblerIdx) {
 					dispatchMove(direction);
 				}
 				lastStepX += steps * pinSize * Math.sign(stepDelta);
-				hasDragged = true;
 			},
 			{ signal: ac.signal }
 		);
