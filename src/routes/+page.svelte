@@ -2,21 +2,32 @@
 	import DepTable from "$lib/components/DepTable.svelte";
 	import ImportInput from "$lib/components/ImportInput.svelte";
 	import LockView from "$lib/components/LockView.svelte";
-	import SolutionManager from "$lib/components/SolutionManager.svelte";
+	import SolutionView from "$lib/components/SolutionView.svelte";
 	import { Field } from "$lib/models/Field.svelte";
-	import { GlobalEditorStateEnum } from "$lib/models/GlobalEditorStateEnum";
 	import * as persistency from "$lib/persistency/lockView";
 	import { pickleView } from "$lib/persistency/PickledLockView";
+	import { SolutionManager } from "$lib/models/SolutionManager.svelte";
+	import { EditorStateEnum } from "$lib/models/EditorStateEnum";
 
 	const savedState = persistency.tryRestoreLockView();
 	let field = $state(savedState.field);
 	let lockName = $state(savedState.lockName);
-	let globalState = $state<GlobalEditorStateEnum>(GlobalEditorStateEnum.lockCreation);
+
+	const solutionManager = new SolutionManager(() => field);
 
 	function save() {
 		persistency.saveLockView({ field, lockName });
 	}
 	function newLock() {
+		if (
+			solutionManager.movesHistory.length &&
+			!confirm(
+				"You will lose the moves you made and any unsaved changes to the lock. Are you sure?"
+			)
+		) {
+			return;
+		}
+		solutionManager.editorState = EditorStateEnum.lockCreation;
 		field = new Field();
 		lockName = "Unnamed lock";
 	}
@@ -61,12 +72,12 @@
 
 	<section class="dependencies">
 		<h3>Dependencies table</h3>
-		<DepTable {field} {globalState} />
+		<DepTable {field} editorState={solutionManager.editorState} />
 	</section>
 
 	<section class="solution">
 		<h3>Solution steps</h3>
-		<SolutionManager {field} {lockViewEl} bind:globalState />
+		<SolutionView {field} {lockViewEl} {solutionManager} />
 	</section>
 </article>
 

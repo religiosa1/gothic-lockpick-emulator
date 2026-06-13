@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { MediaQuery } from "svelte/reactivity";
 	import type { Field } from "$lib/models/Field.svelte";
-	import { GlobalEditorStateEnum } from "$lib/models/GlobalEditorStateEnum";
+	import { EditorStateEnum } from "$lib/models/EditorStateEnum";
 	import { idxToChar } from "$lib/models/TumblerIdx";
 
 	interface Props {
 		field: Field;
-		globalState: GlobalEditorStateEnum;
+		editorState: EditorStateEnum;
 	}
-	let { field, globalState }: Props = $props();
+	let { field, editorState }: Props = $props();
 
 	let table: HTMLTableElement;
 	let tbody: HTMLTableSectionElement;
@@ -136,8 +136,8 @@
 							<button
 								class="dep-cell__btn"
 								type="button"
-								disabled={globalState !== GlobalEditorStateEnum.lockCreation}
-								title={globalState !== GlobalEditorStateEnum.lockCreation
+								disabled={editorState !== EditorStateEnum.lockCreation}
+								title={editorState !== EditorStateEnum.lockCreation
 									? "Switch to lock editing mode to modify"
 									: undefined}
 								onclick={(e) => {
@@ -183,8 +183,8 @@
 
 <button
 	type="button"
-	disabled={globalState !== GlobalEditorStateEnum.lockCreation}
-	title={globalState !== GlobalEditorStateEnum.lockCreation
+	disabled={editorState !== EditorStateEnum.lockCreation}
+	title={editorState !== EditorStateEnum.lockCreation
 		? "Switch to lock editing mode to modify"
 		: undefined}
 	onclick={() => field.clearDependencies()}>Clear Dependencies</button

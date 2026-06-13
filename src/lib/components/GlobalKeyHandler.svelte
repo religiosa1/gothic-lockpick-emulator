@@ -1,16 +1,24 @@
 <script lang="ts">
 	import { DirectionEnum } from "$lib/models/DirectionEnum";
-	import type { Field } from "$lib/models/Field.svelte";
 	import { Move } from "$lib/models/Move";
 	import { MOVE_REQUESTED_EVENT } from "$lib/models/MoveRequestedEvent";
+	import type { TumblerIdx } from "$lib/models/TumblerIdx";
 
 	interface Props {
-		field: Field;
+		onPrevTumbler(): void;
+		onNextTumbler(): void;
+		currentlySelectedIdx: TumblerIdx;
 		/** Focus should be either on the body, or on this specific elements */
 		includedElements: HTMLElement[];
 		onMoveRequested: (move: Move) => void;
 	}
-	let { field, includedElements, onMoveRequested }: Props = $props();
+	let {
+		onNextTumbler,
+		onPrevTumbler,
+		currentlySelectedIdx,
+		includedElements,
+		onMoveRequested,
+	}: Props = $props();
 
 	$effect(() => {
 		const ac = new AbortController();
@@ -45,25 +53,25 @@
 			case "ArrowUp":
 			case "w":
 			case "k": {
-				field.selectPrevTumbler();
+				onPrevTumbler();
 				break;
 			}
 			case "ArrowDown":
 			case "s":
 			case "j": {
-				field.selectNextTumbler();
+				onNextTumbler();
 				break;
 			}
 			case "ArrowLeft":
 			case "a":
 			case "h": {
-				onMoveRequested(new Move(field.selectedTumblerIdx, DirectionEnum.Left));
+				onMoveRequested(new Move(currentlySelectedIdx, DirectionEnum.Left));
 				break;
 			}
 			case "ArrowRight":
 			case "d":
 			case "l": {
-				onMoveRequested(new Move(field.selectedTumblerIdx, DirectionEnum.Right));
+				onMoveRequested(new Move(currentlySelectedIdx, DirectionEnum.Right));
 				break;
 			}
 		}
