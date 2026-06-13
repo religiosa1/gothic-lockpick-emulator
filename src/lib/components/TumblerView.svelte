@@ -14,7 +14,6 @@
 </script>
 
 <ul
-	data-pos={tumbler.currentPosition}
 	style:--offset={offset}
 	class="tumbler"
 	{@attach tumblerMouseDrag(idx)}

@@ -1,7 +1,7 @@
 export type TumblerIdx = number;
 
 export function idxToChar(n: TumblerIdx): string {
-	let result = '';
+	let result = "";
 	n += 1; // shift to 1-indexed
 	while (n > 0) {
 		n -= 1;

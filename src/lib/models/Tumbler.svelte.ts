@@ -1,4 +1,4 @@
-import type { TumblerIdx } from './TumblerIdx';
+import type { TumblerIdx } from "./TumblerIdx";
 
 export class Tumbler {
 	startingPosition = $state<TumblerIdx>(0);
