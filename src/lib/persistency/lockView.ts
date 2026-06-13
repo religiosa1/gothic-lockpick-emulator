@@ -13,12 +13,6 @@ export function saveLockView(state: UnpickledLockView): void {
 	console.log("Saved current state");
 }
 
-export function deleteLockView(): UnpickledLockView {
-	localStorage.removeItem(LS_KEY);
-	console.log("Deleted current state");
-	return makeDefaultState();
-}
-
 export function restoreFromJson(jsonValue: string): UnpickledLockView {
 	const parsed = JSON.parse(jsonValue) as PickledLockView;
 	return unpickleView(parsed);

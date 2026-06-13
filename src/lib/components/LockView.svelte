@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { MediaQuery } from "svelte/reactivity";
+	import { failedMoveAnimation } from "$lib/attachments/failedMoveAnnimation";
 	import type { Field } from "$lib/models/Field.svelte";
 	import TumblerView from "./TumblerView.svelte";
 
@@ -7,6 +9,7 @@
 		lockViewEl: HTMLUListElement | undefined;
 	}
 	let { field, lockViewEl = $bindable() }: Props = $props();
+	const isMobile = new MediaQuery("(width < 66ch)");
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -26,13 +29,20 @@
 			class:selected={idx === field.selectedTumblerIdx}
 			class:dep-neg={depExpression < 0}
 			class:dep-pos={depExpression > 0}
-			onclick={() => (field.selectedTumblerIdx = idx)}
+			onpointerdown={() => (field.selectedTumblerIdx = idx)}
+			{@attach failedMoveAnimation(idx)}
 		>
 			<TumblerView {tumbler} width={field.tumblerWidth} targetRow={field.tumblerRow} {idx} />
 		</li>
 	{/each}
 </ul>
-<small>use arrow keys, wasd or hjkl for modifying</small>
+<small>
+	{#if isMobile.current}
+		drag tumblers left and right
+	{:else}
+		use arrow keys, wasd or hjkl for modifying
+	{/if}
+</small>
 
 <style>
 	.tumblers-list {
@@ -69,5 +79,10 @@
 		outline-color: var(--clr-hl);
 		outline: 2px solid;
 		background: var(--clr-bg-hl);
+	}
+	:global(.tumblers-list__item.failed-move::before) {
+		text-decoration: underline;
+		text-decoration-style: wavy;
+		text-decoration-color: var(--clr-danger);
 	}
 </style>

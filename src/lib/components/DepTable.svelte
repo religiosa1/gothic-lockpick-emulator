@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { MediaQuery } from "svelte/reactivity";
 	import type { Field } from "$lib/models/Field.svelte";
 	import { GlobalEditorStateEnum } from "$lib/models/GlobalEditorStateEnum";
 	import { idxToChar } from "$lib/models/TumblerIdx";
@@ -59,6 +60,8 @@
 		}
 		horizontalSelectionIndex = newValue;
 	}
+
+	const isMobile = new MediaQuery("(width < 66ch)");
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -170,7 +173,11 @@
 </table>
 <div>
 	<small>
-		click to toggle,<br /> ctrl+click backwards
+		{#if isMobile.current}
+			tap to modify
+		{:else}
+			click to toggle ,<br /> ctrl+click backwards
+		{/if}
 	</small>
 </div>
 
@@ -195,9 +202,15 @@
 	}
 	.deptable :is(td, th) {
 		padding: 0;
-		width: var(--pin-size);
-		height: var(--pin-size);
+		--size: var(--pin-size);
+		width: var(--size);
+		height: var(--size);
 		position: relative;
+		/* on a single column mobile view we don't care about aliging a cell with 
+     * a tumbler veritcally, but we want to give sufficient click area */
+		@media (width < 66ch) {
+			--size: calc(var(--pin-size) * 1.6);
+		}
 	}
 	.dep-cell__btn {
 		all: unset;

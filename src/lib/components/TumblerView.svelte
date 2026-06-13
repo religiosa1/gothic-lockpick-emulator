@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { Tumbler } from "../models/Tumbler.svelte";
-	import { tumblerMouseDragAttachment } from "./tumblerMouseDragAttachment";
+	import type { Tumbler } from "$lib/models/Tumbler.svelte";
+	import { tumblerMouseDrag } from "$lib/attachments/tumblerMouseDrag";
+	import { failedMoveAnimation } from "$lib/attachments/failedMoveAnnimation";
 
 	interface Props {
 		tumbler: Tumbler;
@@ -16,29 +17,8 @@
 	data-pos={tumbler.currentPosition}
 	style:--offset={offset}
 	class="tumbler"
-	{@attach tumblerMouseDragAttachment(idx)}
-	{@attach (el) => {
-		const ac = new AbortController();
-
-		document.addEventListener(
-			"failed-tumbler-move",
-			(e) => {
-				if (!e.detail.indexes.includes(idx)) {
-					return;
-				}
-				el.style.animation = "tumbler-shake 1s";
-				el.addEventListener(
-					"animationend",
-					() => {
-						el.style.animation = "";
-					},
-					{ once: true }
-				);
-			},
-			{ signal: ac.signal }
-		);
-		return () => ac.abort();
-	}}
+	{@attach tumblerMouseDrag(idx)}
+	{@attach failedMoveAnimation(idx)}
 >
 	{#each Array(width), idx}
 		<li
@@ -66,6 +46,10 @@
 		transition: var(--transition-props);
 		transition-property: margin-left;
 	}
+	:global(.tumbler.failed-move) {
+		animation: shake 1s infinite;
+		outline: 1px solid var(--clr-danger);
+	}
 	.pin {
 		flex-shrink: 0;
 		flex-grow: 0;
@@ -76,13 +60,16 @@
 		aspect-ratio: 1;
 		box-sizing: border-box;
 		padding: calc(var(--pin-size) * 0.1);
+		@media (width < 66ch) {
+			aspect-ratio: 1/1.6;
+		}
 	}
 	.pin::after {
 		content: "";
 		display: block;
 		border-radius: 50%;
 		width: 80%;
-		height: 80%;
+		aspect-ratio: 1;
 		margin: auto;
 		background: black;
 		transition: var(--transition-props);
@@ -98,43 +85,40 @@
 		background: red;
 	}
 
-	:global {
-		@keyframes tumbler-shake {
-			0%,
-			100% {
-				rotate: 0deg;
-				translate: 0 0;
-				outline: 1px solid red;
-			}
-			10% {
-				rotate: -1deg;
-			}
-			20% {
-				rotate: 1deg;
-			}
-			30% {
-				rotate: -1deg;
-				translate: 1px 0;
-			}
-			40% {
-				rotate: 1deg;
-			}
-			50% {
-				rotate: -1deg;
-			}
-			60% {
-				rotate: 1deg;
-				translate: -1px 0;
-			}
-			70% {
-				rotate: -1deg;
-			}
-			80% {
-				rotate: 1deg;
-			}
-			90% {
-				rotate: -1deg;
-			}
+	@keyframes shake {
+		0%,
+		100% {
+			rotate: 0deg;
+			translate: 0 0;
+		}
+		10% {
+			rotate: -1deg;
+		}
+		20% {
+			rotate: 1deg;
+		}
+		30% {
+			rotate: -1deg;
+			translate: 1px 0;
+		}
+		40% {
+			rotate: 1deg;
+		}
+		50% {
+			rotate: -1deg;
+		}
+		60% {
+			rotate: 1deg;
+			translate: -1px 0;
+		}
+		70% {
+			rotate: -1deg;
+		}
+		80% {
+			rotate: 1deg;
+		}
+		90% {
+			rotate: -1deg;
 		}
 	}
 </style>

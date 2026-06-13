@@ -3,7 +3,7 @@ import { Move } from "$lib/models/Move";
 import { MOVE_REQUESTED_EVENT } from "$lib/models/MoveRequestedEvent";
 import { DirectionEnum } from "$lib/models/DirectionEnum";
 
-export function tumblerMouseDragAttachment(idx: TumblerIdx) {
+export function tumblerMouseDrag(idx: TumblerIdx) {
 	function dispatchMove(direction: DirectionEnum) {
 		document.dispatchEvent(
 			new CustomEvent(MOVE_REQUESTED_EVENT, { detail: new Move(idx, direction) })

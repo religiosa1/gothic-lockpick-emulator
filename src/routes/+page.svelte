@@ -38,12 +38,6 @@
 
 <h2 contenteditable bind:textContent={lockName}></h2>
 <button onclick={save} type="button">Save Lock</button>
-<button
-	type="button"
-	onclick={() => {
-		({ field, lockName } = persistency.deleteLockView());
-	}}>Delete lock</button
->
 <button onclick={newLock} type="button">New Lock</button>
 
 <article>
@@ -97,10 +91,11 @@
 		--clr-bg-neg: hwb(from var(--clr-neg) h w b / 0.12);
 		--clr-bg-pos: hwb(from var(--clr-pos) h w b / 0.12);
 		--clr-bg-hl: hwb(from var(--clr-hl) h w b / 0.05);
-	}
-	@media (width < 350px) {
-		:root {
+		@media (width < 66ch) {
 			--pin-size: 1.2rem;
+		}
+		@media (width < 320px) {
+			--pin-size: 1rem;
 		}
 	}
 	h2 {
@@ -121,6 +116,7 @@
 		position: relative;
 		display: grid;
 		grid-template-areas: "lock deps solution";
+		gap: 1rem;
 		@media (width < 90ch) {
 			grid-template-areas:
 				"lock solution"
