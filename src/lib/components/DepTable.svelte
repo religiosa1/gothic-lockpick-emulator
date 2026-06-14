@@ -122,7 +122,7 @@
 				</th>
 				{#each Array(field.nTumblers), depIdx}
 					{#if depIdx === idx}
-						<td>⨯</td>
+						<td class="dep-self">⨯</td>
 					{:else}
 						{@const expression = field.dependencies[idx][depIdx]}
 						<td
@@ -232,7 +232,8 @@
 		th {
 			background-color: var(--clr-bg-hl);
 		}
-		th {
+		th,
+		.dep-self {
 			color: var(--clr-hl);
 		}
 	}

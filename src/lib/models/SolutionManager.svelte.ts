@@ -9,10 +9,12 @@ import { SnapshotPacker } from "./SnapshotPacker";
 export class SolutionManager {
 	movesHistory = $state<IMoveState[]>([]);
 
-	/** Offset in move state from history -- during normal operations must be on 0,
-	 * after undo it decrements by one, redo increments it back */
+	/** Offset in move history from the top -- during normal operations must be on 0,
+	 * after undo it decrements by one, redo increments it back. Always non-negative */
 	historyOffset = $state(0);
 
+	/** Index of current active move history item. negative value denotes "no
+	 * move made yet", aka the initial state */
 	currentHistoryIdx = $derived.by(() => {
 		return this.movesHistory.length - Math.max(this.historyOffset, 0) - 1;
 	});
@@ -123,7 +125,7 @@ export class SolutionManager {
 	reset(clearMovesHistory: boolean) {
 		this.field.reset();
 		if (clearMovesHistory) {
-			this.historyOffset = -1;
+			this.historyOffset = 0;
 			this.movesHistory.length = 0;
 		} else {
 			this.historyOffset = this.movesHistory.length || -1;
@@ -178,6 +180,9 @@ export class SolutionManager {
 				for (const state of solutionSteps) {
 					this.movesHistory.push(state);
 				}
+				// if (this.historyOffset < 0) {
+				this.historyOffset = 0;
+				// }
 				this.historyOffset += solutionSteps.length;
 				// moving the focus to the solution manager, so you can immediately go
 				// through it
