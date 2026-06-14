@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MediaQuery } from "svelte/reactivity";
+	import { isMobile } from "$lib/isMobile";
 	import { EditorStateEnum } from "$lib/models/enums/EditorStateEnum";
 	import type { Field } from "$lib/models/Field.svelte";
 	import { idxToChar } from "$lib/models/TumblerIdx";
@@ -60,8 +60,6 @@
 		}
 		horizontalSelectionIndex = newValue;
 	}
-
-	const isMobile = new MediaQuery("(width < 66ch)");
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->

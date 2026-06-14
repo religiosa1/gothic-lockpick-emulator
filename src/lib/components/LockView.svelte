@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { MediaQuery } from "svelte/reactivity";
 	import { failedMoveAnimation } from "$lib/attachments/failedMoveAnnimation";
+	import { isMobile } from "$lib/isMobile";
 	import type { Field } from "$lib/models/Field.svelte";
 	import TumblerView from "./TumblerView.svelte";
 
@@ -9,7 +9,6 @@
 		lockViewEl: HTMLUListElement | undefined;
 	}
 	let { field, lockViewEl = $bindable() }: Props = $props();
-	const isMobile = new MediaQuery("(width < 66ch)");
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->

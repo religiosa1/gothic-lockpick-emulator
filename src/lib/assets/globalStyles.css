@@ -2,6 +2,7 @@
 	--clr-brd: lightgray;
 	--clr-brd-dark: rgb(84, 84, 84);
 	--clr-bg: white;
+	--clr-txt: black;
 	--clr-surface: white;
 	--body-pad: 0.5rem;
 
@@ -42,6 +43,7 @@ body {
 	min-height: 100vh;
 	min-height: 100dvh;
 	padding: 0;
+	color: var(--clr-txt);
 }
 
 .error {
