@@ -4,7 +4,7 @@
 	}
 	let { value = $bindable() }: Props = $props();
 
-	const min = 5;
+	const min = 4;
 	const max = 7;
 </script>
 
