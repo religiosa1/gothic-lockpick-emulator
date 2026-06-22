@@ -10,6 +10,7 @@
 	import LockView from "$lib/components/LockView.svelte";
 	import SolutionView from "$lib/components/SolutionView.svelte";
 	import GlobalKeyHandler from "$lib/components/GlobalKeyHandler.svelte";
+	import NTumblerControl from "$lib/components/NTumblerControl.svelte";
 
 	const savedState = persistency.tryRestoreLockView();
 	let field = $state(savedState.field);
@@ -71,19 +72,7 @@
 <article>
 	<section class="lock-view">
 		<h3>Lock View</h3>
-		<!-- We're setting this input to the height of "pin", so both tumblers 
-     and dep cells are aligned on desktop -->
-		<label class="n-tumblers">
-			Number of tumblers
-			<input
-				class="n-tumblers__input"
-				type="number"
-				min="2"
-				max="9"
-				step="1"
-				bind:value={field.nTumblers}
-			/>
-		</label>
+		<NTumblerControl bind:value={field.nTumblers} />
 		<LockView {field} bind:lockViewEl />
 	</section>
 
@@ -174,15 +163,6 @@
 				border-bottom: 1px solid black;
 			}
 		}
-	}
-	.n-tumblers {
-		display: flex;
-		height: var(--pin-size);
-		align-items: center;
-		gap: 0.2em;
-	}
-	.n-tumblers__input {
-		max-height: var(--pin-size);
 	}
 
 	.dependencies {

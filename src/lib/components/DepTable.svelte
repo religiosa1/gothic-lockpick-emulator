@@ -109,7 +109,9 @@
 			{#each Array(field.nTumblers), idx}
 				{@const curExpression = field.dependencies[field.selectedTumblerIdx][idx]}
 				<th class:dep-neg={curExpression < 0} class:dep-pos={curExpression > 0}>
-					{idxToChar(idx)}
+					<button class="nav-button" type="button" onclick={() => (field.selectedTumblerIdx = idx)}>
+						{idxToChar(idx)}
+					</button>
 				</th>
 			{/each}
 		</tr>
@@ -118,7 +120,9 @@
 		{#each Array(field.nTumblers), idx}
 			<tr data-idx={idx} class:selected-row={idx === field.selectedTumblerIdx}>
 				<th scope="row">
-					{idxToChar(idx)}
+					<button class="nav-button" type="button" onclick={() => (field.selectedTumblerIdx = idx)}>
+						{idxToChar(idx)}
+					</button>
 				</th>
 				{#each Array(field.nTumblers), depIdx}
 					{#if depIdx === idx}
@@ -210,6 +214,8 @@
 			--size: calc(var(--pin-size) * 1.6);
 		}
 	}
+
+	.nav-button,
 	.dep-cell__btn {
 		all: unset;
 		cursor: pointer;
@@ -219,10 +225,12 @@
 		background: none;
 		border: none;
 		color: currentColor;
-		font-size: 1.2rem;
 		&:focus {
 			outline: 2px solid var(--clr-hl);
 		}
+	}
+	.dep-cell__btn {
+		font-size: 1.2rem;
 	}
 	.dep-cell__btn:disabled {
 		cursor: not-allowed;
