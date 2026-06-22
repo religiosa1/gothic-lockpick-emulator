@@ -165,10 +165,12 @@
 			type="button"
 			class="next-step-btn"
 			onclick={() => {
-				// providing haptic feedback for speed solving on mobile
-				if (typeof navigator.vibrate === "function") {
-					navigator.vibrate(200);
-				}
+				// providing haptic feedback for speed solving on mobile. Quite finicky:
+				// - System "touch/vibration" should be on (Settings/Sound and vibration)
+				// - Battery saver should be off
+				// - Site setting "Sound and vibration" blocked for the origin (chrome://settings site permissions).
+				// And works mostly in chrome only, not supported in firefox
+				navigator.vibrate?.(20);
 				solutionManager.nextState();
 			}}
 		>
