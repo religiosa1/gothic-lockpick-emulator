@@ -164,7 +164,13 @@
 			transition:fly={{ x: 100 }}
 			type="button"
 			class="next-step-btn"
-			onclick={() => solutionManager.nextState()}
+			onclick={() => {
+				// providing haptic feedback for speed solving on mobile
+				if (typeof navigator.vibrate === "function") {
+					navigator.vibrate(200);
+				}
+				solutionManager.nextState();
+			}}
 		>
 			Next Move
 		</button>
@@ -240,6 +246,7 @@
 		bottom: 1rem;
 		right: 1rem;
 		position: fixed;
+		height: 4rem;
 		box-shadow: 0 0 0.3rem hwb(from var(--clr-txt) h w b / 0.35);
 	}
 </style>
