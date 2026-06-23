@@ -46,6 +46,14 @@ export class SolutionManager {
 		return this.#packer;
 	}
 
+	isCurrentStateSolved = $derived.by(() => {
+		if (!this.movesHistory.length) {
+			return false;
+		}
+		const current = this.movesHistory[this.currentHistoryIdx];
+		return current.state === this.#solvedState;
+	});
+
 	#solvedState = $derived.by(() =>
 		this.packer.pack(new Array(this.field.nTumblers).fill(this.field.tumblerRow))
 	);
@@ -79,7 +87,8 @@ export class SolutionManager {
 		if (this.editorState === EditorStateEnum.autoSolving) {
 			return;
 		}
-		const failed = this.field.moveTumbler(move);
+		const shouldSkipDeps = this.nonSolvingState;
+		const failed = this.field.moveTumbler(move, shouldSkipDeps);
 		if (failed.length) {
 			dispatchFailedMoveEvent(failed);
 			return;

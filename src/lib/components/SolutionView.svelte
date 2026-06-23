@@ -36,6 +36,10 @@
 	const hasRedoItems = $derived(
 		solutionManager.currentHistoryIdx < solutionManager.movesHistory.length - 1
 	);
+
+	const stepsToSolve = $derived(
+		solutionManager.movesHistory.findIndex((h) => h.state === solutionManager.solvedState) + 1
+	);
 </script>
 
 <div class="solution-view">
@@ -121,6 +125,9 @@
 					onclick={() => solutionManager.reset(false)}
 				>
 					Initial state
+					{#if stepsToSolve > 0}
+						({stepsToSolve} steps to solve)
+					{/if}
 				</button>
 			</li>
 		{/if}

@@ -75,11 +75,14 @@ export class Field {
 		}
 	}
 
-	moveTumbler(move: Move): TumblerIdx[] {
+	moveTumbler(move: Move, omitDeps = false): TumblerIdx[] {
 		const deps = this.dependencies[move.idx];
 		const newPositions = this.tumblers.map((t, i) => {
 			if (i === move.idx) {
 				return t.currentPosition + move.direction;
+			}
+			if (omitDeps) {
+				return t.currentPosition;
 			}
 			return t.currentPosition + deps[i] * move.direction;
 		});

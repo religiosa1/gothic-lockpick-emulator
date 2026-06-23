@@ -37,6 +37,7 @@
 	function newLock() {
 		if (
 			solutionManager.movesHistory.length &&
+			!solutionManager.isCurrentStateSolved &&
 			!confirm(
 				"You will lose the moves you made and any unsaved changes to the lock. Are you sure?"
 			)
