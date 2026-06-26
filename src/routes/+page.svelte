@@ -102,9 +102,9 @@
 <style>
 	:root {
 		--pin-size: 1.4rem;
-		--clr-neg: red;
-		--clr-pos: blue;
-		--clr-hl: green;
+		--clr-neg: #cc0000;
+		--clr-pos: #0000ff;
+		--clr-hl: #007000; /* Slightly darker green, instead of default #080
 		/* derived vars */
 		--clr-bg-neg: hwb(from var(--clr-neg) h w b / 0.12);
 		--clr-bg-pos: hwb(from var(--clr-pos) h w b / 0.12);

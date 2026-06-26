@@ -4,6 +4,7 @@
 	import type { SolutionManager } from "$lib/models/SolutionManager.svelte";
 	import { fly } from "svelte/transition";
 	import Toggle from "./Toggle.svelte";
+	import MoveView from "./MoveView.svelte";
 
 	interface Props {
 		solutionManager: SolutionManager;
@@ -151,7 +152,7 @@
 					}}
 					disabled={solutionManager.nonSolvingState || idx === solutionManager.currentHistoryIdx}
 				>
-					{state.move.toString()}
+					<MoveView move={state.move} />
 				</button>
 			</li>
 		{/each}
@@ -233,7 +234,7 @@
 		font-weight: bold;
 	}
 	.solved {
-		color: var(--clr-pos);
+		color: var(--clr-hl);
 	}
 	.current::after {
 		content: "▸";
